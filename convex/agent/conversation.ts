@@ -42,7 +42,7 @@ export async function startConversationMessage(
     (m) => m.data.type === 'conversation' && m.data.playerIds.includes(otherPlayerId),
   );
   const prompt = [
-    `You are ${player.name}, and you just started a conversation with ${otherPlayer.name}.`,
+    `You are ${player.name}, and you just started a conversation with ${otherPlayer.name}.You should act and speak as a human, and answer with natural and short answers.`,
   ];
   prompt.push(...agentPrompts(otherPlayer, agent, otherAgent ?? null));
   prompt.push(...previousConversationPrompt(otherPlayer, lastConversation));
@@ -61,7 +61,7 @@ export async function startConversationMessage(
         content: prompt.join('\n'),
       },
     ],
-    max_tokens: 300,
+    max_tokens: 50,
     stream: true,
     stop: stopWords(otherPlayer.name, player.name),
   });
@@ -119,7 +119,7 @@ export async function continueConversationMessage(
 
   const { content } = await chatCompletion({
     messages: llmMessages,
-    max_tokens: 300,
+    max_tokens: 50,
     stream: true,
     stop: stopWords(otherPlayer.name, player.name),
   });
@@ -168,7 +168,7 @@ export async function leaveConversationMessage(
 
   const { content } = await chatCompletion({
     messages: llmMessages,
-    max_tokens: 300,
+    max_tokens: 50,
     stream: true,
     stop: stopWords(otherPlayer.name, player.name),
   });
