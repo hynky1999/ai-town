@@ -46,20 +46,19 @@ export type SerializedGameCycle = ObjectType<typeof gameCycleSchema>;
 const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, now: number) => {
   console.log(`state changed: ${ prevState } -> ${ newState }`);
   if (prevState === 'PlayerKillVoting') {
-    const mostVotedPlayer = processVotes(game.world.votes, [...game.world.players.values()])[0];
+    const mostVotedPlayer = processVotes(game.world.gameVotes, [...game.world.players.values()])[0];
     const playerToKill = game.world.players.get(mostVotedPlayer);
     if (playerToKill) {
       playerToKill.kill(game, now);
     }
   }
   if (prevState === 'WerewolfVoting') {
-    const mostVotedPlayer = processVotes(game.world.votes, [...game.world.players.values()])[0];
+    const mostVotedPlayer = processVotes(game.world.gameVotes, [...game.world.players.values()])[0];
     const suspect = game.world.players.get(mostVotedPlayer)
     if (suspect?.playerType(game) === 'werewolf') {
       suspect?.kill(game, now)
     }
   }
-  // TODO: Implement LLM voting
 };
 
 export class GameCycle {

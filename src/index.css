@@ -40,8 +40,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb)))
-    rgb(var(--background-start-rgb));
+  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
 }
 
 .game-background {
@@ -148,6 +147,10 @@ body {
   transform: translateY(-15%);
 }
 
+.button-selected {
+  border-image-source: url(../assets/ui/button_pressed.svg);
+}
+
 @media (max-width: 640px) {
   .button {
     height: 40px;
@@ -155,8 +158,8 @@ body {
     font-size: 16px;
   }
 
-  .button > div,
-  .button > span {
+  .button>div,
+  .button>span {
     vertical-align: top;
     line-height: 1;
   }

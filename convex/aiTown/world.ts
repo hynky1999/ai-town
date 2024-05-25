@@ -21,7 +21,8 @@ export const serializedWorld = {
   agents: v.array(v.object(serializedAgent)),
   historicalLocations: v.optional(historicalLocations),
   gameCycle: v.object(gameCycleSchema),
-  votes: v.object(VotesSchema)
+  gameVotes: v.array(v.object(VotesSchema)),
+  llmVotes: v.array(v.object(VotesSchema)),
 };
 export type SerializedWorld = ObjectType<typeof serializedWorld>;
 
@@ -32,7 +33,8 @@ export class World {
   agents: Map<GameId<'agents'>, Agent>;
   historicalLocations?: Map<GameId<'players'>, ArrayBuffer>;
   gameCycle: GameCycle;
-  votes: Votes;
+  gameVotes: Votes[];
+  llmVotes: Votes[];
 
   constructor(serialized: SerializedWorld) {
     const { nextId, historicalLocations } = serialized;
@@ -42,7 +44,8 @@ export class World {
     this.players = parseMap(serialized.players, Player, (p) => p.id);
     this.agents = parseMap(serialized.agents, Agent, (a) => a.id);
     this.gameCycle = new GameCycle(serialized.gameCycle);
-    this.votes = new Votes(serialized.votes);
+    this.gameVotes = serialized.gameVotes.map((v) => new Votes(v));
+    this.llmVotes = serialized.llmVotes.map((v) => new Votes(v));
 
     if (historicalLocations) {
       this.historicalLocations = new Map();
@@ -69,7 +72,8 @@ export class World {
           location,
         })),
       gameCycle: this.gameCycle.serialize(),
-      votes: this.votes.serialize(),
+      gameVotes: this.gameVotes.map((v) => v.serialize()),
+      llmVotes: this.llmVotes.map((v) => v.serialize()),
     };
   }
 }

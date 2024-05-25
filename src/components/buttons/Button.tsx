@@ -8,12 +8,16 @@ export default function Button(props: {
   onClick?: MouseEventHandler;
   title?: string;
   children: ReactNode;
+  selected?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <a
       className={clsx(
         'button text-white shadow-solid text-xl pointer-events-auto',
         props.className,
+        props.selected && 'button-selected',
+        props.disabled && 'disabled',
       )}
       href={props.href}
       title={props.title}

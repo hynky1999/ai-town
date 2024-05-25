@@ -15,6 +15,7 @@ import { stopPlayer, findRoute, blocked, movePlayer } from './movement';
 import { inputHandler } from './inputHandler';
 import { characters } from '../../data/characters';
 import { CharacterType, CharacterTypeSchema, PlayerDescription } from './playerDescription';
+import { gameVote, llmVote } from './voting';
 
 const pathfinding = v.object({
   destination: point,
@@ -333,16 +334,27 @@ export const playerInputs = {
       return null;
     },
   }),
-
-  vote: inputHandler({
+  gameVote: inputHandler({
     args: {
-      votedPlayerId: v.string(),
-      voteType: v.string(),
+      voter: playerId,
+      votedPlayerIds: v.array(playerId),
     },
     handler: (game, now, args) => {
-      const votedPlayerId = parseGameId('players', args.votedPlayerId);
-      // TODO: Implement the fucntion
-      // game.vote(votedPlayerId);
+      const voterId = parseGameId('players', args.voter);
+      const votedPlayerIds = args.votedPlayerIds.map((playerId) => parseGameId('players', playerId));
+      gameVote(game, voterId, votedPlayerIds);
+      return null;
+    },
+  }),
+  llmVote: inputHandler({
+    args: {
+      voter: playerId,
+      votedPlayerIds: v.array(playerId),
+    },
+    handler: (game, now, args) => {
+      const voterId = parseGameId('players', args.voter);
+      const votedPlayerIds = args.votedPlayerIds.map((playerId) => parseGameId('players', playerId));
+      llmVote(game, voterId, votedPlayerIds);
       return null;
     },
   }),

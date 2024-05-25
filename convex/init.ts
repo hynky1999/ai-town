@@ -65,10 +65,8 @@ async function getOrCreateDefaultWorld(ctx: MutationCtx) {
       cycleState: 'Day',
       cycleIndex: 0,
     },
-    votes: {
-      votesType: 'KillVotes',
-      votes: [],
-    },
+    gameVotes: [],
+    llmVotes: []
   });
   const worldStatusId = await ctx.db.insert('worldStatus', {
     engineId: engineId,

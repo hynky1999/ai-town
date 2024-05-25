@@ -53,8 +53,8 @@ export function GameStateLabel(gameCycle: GameCycle) {
   }
 }
 
-export function isVotingState(gameCycle: GameCycle) {
-  return gameCycle.cycleState === "WerewolfVoting" || gameCycle.cycleState === "PlayerKillVoting";
+export function canVote(gameCycle: GameCycle, playerId: GameId<'players'> | undefined) {
+  return (gameCycle.cycleState === "WerewolfVoting" || gameCycle.cycleState === "PlayerKillVoting") && playerId;
 }
 
 function showMap(gameCycle: GameCycle, me: PlayerDescription | undefined) {
@@ -88,10 +88,10 @@ export default function Game() {
   if (!worldId || !engineId || !game || !humanTokenIdentifier) {
     return null;
   }
-  const humanPlayerId = [...game.world.players.values()].find(
+  const playerId = [...game.world.players.values()].find(
     (p) => p.human === humanTokenIdentifier,
   )?.id;
-  const meDescription = humanPlayerId ? game?.playerDescriptions.get(humanPlayerId) : undefined;
+  const meDescription = playerId ? game?.playerDescriptions.get(playerId) : undefined;
   return (
     <>
       {SHOW_DEBUG_UI && <DebugTimeManager timeManager={timeManager} width={200} height={100} />}
@@ -130,7 +130,7 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
             <h2 className="text-2xl font-bold">{GameStateLabel(game.world.gameCycle).label}</h2>
             <p className="text-lg">{GameStateLabel(game.world.gameCycle).desc}</p>
           </div>
-          {isVotingState(game.world.gameCycle) ?  <VoteModal game={game} worldId={worldId} engineId={engineId} humanPlayerId={humanPlayerId} /> :
+          {canVote(game.world.gameCycle, playerId) ?  <VoteModal game={game} engineId={engineId} playerId={playerId} maxVotes={1} /> :
           <PlayerDetails
             worldId={worldId}
             engineId={engineId}
