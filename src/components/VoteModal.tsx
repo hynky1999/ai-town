@@ -11,27 +11,28 @@ import { BaseTexture, SCALE_MODES, Spritesheet } from "pixi.js";
 import { Sprite, Stage } from "@pixi/react";
 import { Character } from "./Character";
 import { useSendInput } from "../hooks/sendInput";
+import { GameCycle } from "../../convex/aiTown/gameCycle";
 export type Vote = (id: GameId<'players'>) => void;
 
-export function VotingName(gameState: string) {
-  switch (gameState) {
-    case 'warewolf-vote':
+export function VotingName(gameCycle: GameCycle) {
+  switch (gameCycle.cycleIndex) {
+    case 2:
       return {
         name: 'Warewolf Vote',
         desc: 'Select a player who is warewolf',
-        type: 'warewolf-vote',
+        type: 'WarewolfVote',
       };
-    case 'player-kill':
+    case 3:
       return {
         name: 'Player Kill',
         desc: 'Select a player to kill',
-        type: 'player-kill',
+        type: 'PlayerKill',
       };
     default:
       return {
-        name: 'Voting',
+        name: 'Error',
         desc: 'Select a player to vote',
-        type: 'voting',
+        type: 'Error'
       };
   }
 }
@@ -79,8 +80,8 @@ export const VoteModal = ({
   return (
     <>
       <div className="flex flex-col items-center mb-4">
-        <h2 className="text-2xl font-bold">{VotingName(gameState).name}</h2>
-        <p className="text-lg">{VotingName(gameState).desc}</p>
+        <h2 className="text-2xl font-bold">{VotingName(game.world.gameCycle).name}</h2>
+        <p className="text-lg">{VotingName(game.world.gameCycle).desc}</p>
       </div>
       {selectablePlayers.map((playable) => {
         const playerDesc = game.playerDescriptions.get(playable.id);

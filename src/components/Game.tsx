@@ -12,6 +12,7 @@ import { DebugTimeManager } from './DebugTimeManager.tsx';
 import { GameId } from '../../convex/aiTown/ids.ts';
 import { useServerGame } from '../hooks/serverGame.ts';
 import { VoteModal } from './VoteModal.tsx';
+import { GameCycle } from '../../convex/aiTown/gameCycle.ts';
 
 export const SHOW_DEBUG_UI = !!import.meta.env.VITE_SHOW_DEBUG_UI;
 
@@ -38,8 +39,8 @@ export function VotingName(gameState: string) {
   }
 }
 
-export function isVotingState(gameState: any): gameState is 'warewolf-vote' | 'player-kill' {
-  return gameState === 'warewolf-vote' || gameState === 'player-kill';
+export function isVotingState(gameCycle: GameCycle) {
+  return gameCycle.cycleIndex === 2 || gameCycle.cycleIndex === 3;
 }
 
 
@@ -101,7 +102,7 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
           className="flex flex-col overflow-y-auto shrink-0 px-4 py-6 sm:px-6 lg:w-96 xl:pr-6 border-t-8 sm:border-t-0 sm:border-l-8 border-brown-900  bg-brown-800 text-brown-100"
           ref={scrollViewRef}
         >
-          {isVotingState(gameState) ?  <VoteModal game={game} worldId={worldId} engineId={engineId} /> :
+          {isVotingState(game.world.gameCycle) ?  <VoteModal game={game} worldId={worldId} engineId={engineId} /> :
           <PlayerDetails
             worldId={worldId}
             engineId={engineId}

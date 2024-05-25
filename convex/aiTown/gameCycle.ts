@@ -7,6 +7,7 @@ import {
   PLAYER_KILL_VOTE_DURATION,
   LLM_VOTE_DURATION,
 } from '../constants';
+import { processVotes } from './voting';
 
 type CycleState = 'Day' | 'Night' | 'WerewolfVoting' | 'PlayerKillVoting' | 'LLMsVoting' | 'LobbyState'
 
@@ -42,6 +43,19 @@ export const gameCycleSchema = {
 
 export type SerializedGameCycle = ObjectType<typeof gameCycleSchema>;
 
+const onStateChange = (prevState: CycleState, newState: CycleState, game: Game) => {
+  console.log(`state changed: ${ prevState } -> ${ newState }`);
+  if (prevState === 'PlayerKillVoting') {
+    const mostVotedPlayer = processVotes(game.world.votes, [...game.world.players.values()])[0];
+    // TODO: Kill the player
+  }
+  if (prevState === 'WerewolfVoting') {
+    const mostVotedPlayer = processVotes(game.world.votes, [...game.world.players.values()])[0];
+    // TODO: Check if most voted player is werewolf
+  }
+  // TODO: Implement LLM voting
+};
+
 export class GameCycle {
   currentTime: number;
   cycleState: CycleState;
@@ -59,10 +73,11 @@ export class GameCycle {
     this.currentTime += tickDuration;
 
     if (this.currentTime >= stateDurations[this.cycleState]) {
-      console.log(`changed state: ${ this.cycleState }`)
+      const prevState = this.cycleState;
       this.currentTime = 0;
       this.cycleIndex = (this.cycleIndex + 1) % normalCycle.length;
       this.cycleState = normalCycle[this.cycleIndex];
+      onStateChange(prevState, this.cycleState, game);
     }
 }
 

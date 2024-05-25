@@ -5,6 +5,7 @@ import { Agent, serializedAgent } from './agent';
 import { GameId, parseGameId, playerId } from './ids';
 import { parseMap } from '../util/object';
 import { GameCycle, gameCycleSchema } from './gameCycle';
+import { Votes, VotesSchema } from './voting';
 
 export const historicalLocations = v.array(
   v.object({
@@ -19,7 +20,8 @@ export const serializedWorld = {
   players: v.array(v.object(serializedPlayer)),
   agents: v.array(v.object(serializedAgent)),
   historicalLocations: v.optional(historicalLocations),
-  gameCycle: v.object(gameCycleSchema)
+  gameCycle: v.object(gameCycleSchema),
+  votes: v.object(VotesSchema)
 };
 export type SerializedWorld = ObjectType<typeof serializedWorld>;
 
@@ -30,6 +32,7 @@ export class World {
   agents: Map<GameId<'agents'>, Agent>;
   historicalLocations?: Map<GameId<'players'>, ArrayBuffer>;
   gameCycle: GameCycle;
+  votes: Votes;
 
   constructor(serialized: SerializedWorld) {
     const { nextId, historicalLocations } = serialized;
@@ -39,6 +42,7 @@ export class World {
     this.players = parseMap(serialized.players, Player, (p) => p.id);
     this.agents = parseMap(serialized.agents, Agent, (a) => a.id);
     this.gameCycle = new GameCycle(serialized.gameCycle);
+    this.votes = new Votes(serialized.votes);
 
     if (historicalLocations) {
       this.historicalLocations = new Map();
@@ -64,7 +68,8 @@ export class World {
           playerId,
           location,
         })),
-      gameCycle: this.gameCycle.serialize()
+      gameCycle: this.gameCycle.serialize(),
+      votes: this.votes,
     };
   }
 }

@@ -77,6 +77,13 @@ export const WWOLF_VOTE_DURATION = 30000;
 export const PLAYER_KILL_VOTE_DURATION = 30000;
 export const LLM_VOTE_DURATION = 60000;
 
+// Debugging
+// export const DAY_DURATION = 100;
+// export const NIGHT_DURATION = 100;
+// export const WWOLF_VOTE_DURATION = 100;
+// export const PLAYER_KILL_VOTE_DURATION = 100;
+// export const LLM_VOTE_DURATION = 100;
+
 // Bound the number of pathfinding searches we do per game step.
 export const MAX_PATHFINDS_PER_STEP = 16;
 
