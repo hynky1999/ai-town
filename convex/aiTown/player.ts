@@ -307,4 +307,17 @@ export const playerInputs = {
       return null;
     },
   }),
+
+  vote: inputHandler({
+    args: {
+      votedPlayerId: v.string(),
+      voteType: v.string(),
+    },
+    handler: (game, now, args) => {
+      const votedPlayerId = parseGameId('players', args.votedPlayerId);
+      // TODO: Implement the fucntion
+      // game.vote(votedPlayerId);
+      return null;
+    },
+  }),
 };

@@ -11,8 +11,37 @@ import { useHistoricalTime } from '../hooks/useHistoricalTime.ts';
 import { DebugTimeManager } from './DebugTimeManager.tsx';
 import { GameId } from '../../convex/aiTown/ids.ts';
 import { useServerGame } from '../hooks/serverGame.ts';
+import { VoteModal } from './VoteModal.tsx';
 
 export const SHOW_DEBUG_UI = !!import.meta.env.VITE_SHOW_DEBUG_UI;
+
+export function VotingName(gameState: string) {
+  switch (gameState) {
+    case 'warewolf-vote':
+      return {
+        name: 'Warewolf Vote',
+        desc: 'Select a player who is warewolf',
+        type: 'warewolf-vote',
+      };
+    case 'player-kill':
+      return {
+        name: 'Player Kill',
+        desc: 'Select a player to kill',
+        type: 'player-kill',
+      };
+    default:
+      return {
+        name: 'Voting',
+        desc: 'Select a player to vote',
+        type: 'voting',
+      };
+  }
+}
+
+export function isVotingState(gameState: any): gameState is 'warewolf-vote' | 'player-kill' {
+  return gameState === 'warewolf-vote' || gameState === 'player-kill';
+}
+
 
 export default function Game() {
   const convex = useConvex();
@@ -35,6 +64,8 @@ export default function Game() {
   const { historicalTime, timeManager } = useHistoricalTime(worldState?.engine);
 
   const scrollViewRef = useRef<HTMLDivElement>(null);
+  // TODO: base this on the game state
+  const [gameState, setGameState] = useState<'warewolf-vote' | 'player-kill' | 'none'>('none');
 
   if (!worldId || !engineId || !game) {
     return null;
@@ -70,6 +101,7 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
           className="flex flex-col overflow-y-auto shrink-0 px-4 py-6 sm:px-6 lg:w-96 xl:pr-6 border-t-8 sm:border-t-0 sm:border-l-8 border-brown-900  bg-brown-800 text-brown-100"
           ref={scrollViewRef}
         >
+          {isVotingState(gameState) ?  <VoteModal game={game} worldId={worldId} engineId={engineId} /> :
           <PlayerDetails
             worldId={worldId}
             engineId={engineId}
@@ -78,6 +110,7 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
             setSelectedElement={setSelectedElement}
             scrollViewRef={scrollViewRef}
           />
+}
         </div>
       </div>
     </>
