@@ -1,28 +1,25 @@
 import { ServerGame } from "@/hooks/serverGame";
-import { SelectElement } from "./Player";
 import { GameId } from "../../convex/aiTown/ids";
 import Button from "./buttons/Button";
-import { useQuery } from "convex/react";
-import { api } from "../../convex/_generated/api";
 import { Id } from '../../convex/_generated/dataModel';
 import { characters } from "../../data/characters";
 import { useEffect, useState } from "react";
 import { BaseTexture, SCALE_MODES, Spritesheet } from "pixi.js";
-import { Sprite, Stage } from "@pixi/react";
+import { Stage } from "@pixi/react";
 import { Character } from "./Character";
 import { useSendInput } from "../hooks/sendInput";
 import { GameCycle } from "../../convex/aiTown/gameCycle";
 export type Vote = (id: GameId<'players'>) => void;
 
 export function VotingName(gameCycle: GameCycle) {
-  switch (gameCycle.cycleIndex) {
-    case 2:
+  switch (gameCycle.cycleState) {
+    case "WerewolfVoting":
       return {
         name: 'Warewolf Vote',
         desc: 'Select a player who is warewolf',
         type: 'WarewolfVote',
       };
-    case 3:
+    case "PlayerKillVoting":
       return {
         name: 'Player Kill',
         desc: 'Select a player to kill',
@@ -41,10 +38,12 @@ export const VoteModal = ({
   worldId,
   engineId,
   game,
+  humanPlayerId
 }: {
   worldId: Id<'worlds'>,
   engineId: Id<'engines'>,
   game: ServerGame,
+  humanPlayerId: GameId<'players'> | undefined
 
 }) => {
   const [hasVoted, setHasVoted] = useState<boolean>(false);
@@ -57,7 +56,6 @@ export const VoteModal = ({
   const gameState = "warewolf-vote"
 
 
-  const humanTokenIdentifier = useQuery(api.world.userStatus, {worldId});
   const [spriteSheet, setSpriteSheet] = useState<Spritesheet>();
   const character = characters[0]
   useEffect(() => {
@@ -75,14 +73,10 @@ export const VoteModal = ({
   }, []);
   // TODO only let people select non-dead players
   const selectablePlayers = [...game.world.players.values()].filter(
-    (player) => player.id !== humanTokenIdentifier
+    (player) => (player.id !== humanPlayerId && (VotingName(game.world.gameCycle).type === 'WerewolfVoting' || game.playerDescriptions.get(player.id)?.type === 'werewolf'))
   );
   return (
     <>
-      <div className="flex flex-col items-center mb-4">
-        <h2 className="text-2xl font-bold">{VotingName(game.world.gameCycle).name}</h2>
-        <p className="text-lg">{VotingName(game.world.gameCycle).desc}</p>
-      </div>
       {selectablePlayers.map((playable) => {
         const playerDesc = game.playerDescriptions.get(playable.id);
         const character = characters.find((c) => c.name === playerDesc?.character);
