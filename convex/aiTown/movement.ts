@@ -37,13 +37,12 @@ export function movePlayer(
   if (pointsEqual(position, destination)) {
     return;
   }
-  
+
   // Disallow movement in the corresponding cycle state
   const { cycleState } = game.world.gameCycle;
   if (cycleState === 'Night' || cycleState === 'PlayerKillVoting') {
     // 'villager' cannot move
-    const description = game.playerDescriptions.get(player.id)
-    if (description?.type === 'villager') {
+    if (player.playerType(game) === 'villager') {
       return;
     }
   }

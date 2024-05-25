@@ -225,20 +225,18 @@ export class Game extends AbstractGame {
 
     // Check for end game conditions
     // all 'werewolf' are dead -> villagers win
-    const werewolves = [...this.world.players.values()].filter(player => {
-      const description = this.playerDescriptions.get(player.id);
-      return description?.type === 'werewolf'
-    })
+    const werewolves = [...this.world.players.values()].filter(player => 
+      player.playerType(this) === 'werewolf'
+    )
     if (werewolves.length === 0) {
       // TODO finish game with villagers victory
       // console.log('villagers win')
     }
 
     // just 1 'villager' left -> werewolves win
-    const villagers = [...this.world.players.values()].filter(player => {
-      const description = this.playerDescriptions.get(player.id);
-      return description?.type === 'villager'
-    })
+    const villagers = [...this.world.players.values()].filter(player =>
+      player.playerType(this) ===  'villager'
+    )
     if (villagers.length <= 1) {
       // TODO finish game with werewolves victory
       // console.log('werewolves win')

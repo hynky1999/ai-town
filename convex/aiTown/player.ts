@@ -81,6 +81,11 @@ export class Player {
     this.speed = speed;
   }
 
+  playerType(game: Game) {
+    const playerDescription = game.playerDescriptions.get(this.id)
+    return playerDescription?.type;
+  }
+
   tick(game: Game, now: number) {
     if (this.human && this.lastInput < now - HUMAN_IDLE_TOO_LONG) {
       this.leave(game, now);

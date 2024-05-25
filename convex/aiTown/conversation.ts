@@ -64,6 +64,15 @@ export class Conversation {
     const player1 = game.world.players.get(playerId1)!;
     const player2 = game.world.players.get(playerId2)!;
 
+    // during the night, villagers cant talk
+    const { cycleState } = game.world.gameCycle;
+    if (cycleState === 'Night' || cycleState === 'PlayerKillVoting') {
+      if (player1.playerType(game) === 'villager' || player2.playerType(game) === 'villager') {
+        this.stop(game, now);
+        return;
+      }
+    }
+
     const playerDistance = distance(player1?.position, player2?.position);
 
     // If the players are both in the "walkingOver" state and they're sufficiently close, transition both
@@ -137,6 +146,21 @@ export class Conversation {
       console.log(reason);
       return { error: reason };
     }
+    
+    // Forbid villagers to talk in the night
+    const { cycleState } = game.world.gameCycle;
+    if (cycleState === 'Night' || cycleState === 'PlayerKillVoting') {
+      if (player.playerType(game) === 'villager') {
+        const reason = `You are not supposed to talk at night`;
+        console.log(reason);
+        return { error: reason };
+      } else if (invitee.playerType(game) === 'villager') {
+        const reason = `You can't talk to humans at night`;
+        console.log(reason);
+        return { error: reason };
+      }
+    }
+    // Don't invite villagers in the night
     const conversationId = game.allocId('conversations');
     console.log(`Creating conversation ${conversationId}`);
     game.world.conversations.set(

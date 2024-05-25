@@ -48,18 +48,15 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
   if (prevState === 'PlayerKillVoting') {
     const mostVotedPlayer = processVotes(game.world.votes, [...game.world.players.values()])[0];
     const playerToKill = game.world.players.get(mostVotedPlayer);
-    if (playerToKill != undefined) {
+    if (playerToKill) {
       playerToKill.kill(game, now);
     }
   }
   if (prevState === 'WerewolfVoting') {
     const mostVotedPlayer = processVotes(game.world.votes, [...game.world.players.values()])[0];
-    const description = game.playerDescriptions.get(mostVotedPlayer);
-
-    if (description != undefined) {
-      if (description.type === 'werewolf') {
-        game.world.players.get(mostVotedPlayer)?.kill(game, now)
-      }
+    const suspect = game.world.players.get(mostVotedPlayer)
+    if (suspect?.playerType(game) === 'werewolf') {
+      suspect?.kill(game, now)
     }
   }
   // TODO: Implement LLM voting
