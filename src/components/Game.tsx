@@ -13,6 +13,7 @@ import { GameId } from '../../convex/aiTown/ids.ts';
 import { useServerGame } from '../hooks/serverGame.ts';
 import { VoteModal } from './VoteModal.tsx';
 import { GameCycle } from '../../convex/aiTown/gameCycle.ts';
+import { PlayerDescription } from '../../convex/aiTown/playerDescription.ts';
 
 export const SHOW_DEBUG_UI = !!import.meta.env.VITE_SHOW_DEBUG_UI;
 
@@ -40,7 +41,12 @@ export function VotingName(gameState: string) {
 }
 
 export function isVotingState(gameCycle: GameCycle) {
-  return gameCycle.cycleIndex === 2 || gameCycle.cycleIndex === 3;
+  return gameCycle.cycleIndex === 0 || gameCycle.cycleIndex === 2;
+}
+
+function showMap(gameCycle: GameCycle, player: PlayerDescription) {
+  // Here also check for player description
+  return gameCycle.cycleIndex === 2 || gameCycle.cycleIndex == 1;
 }
 
 
@@ -77,7 +83,7 @@ export default function Game() {
       <div className="mx-auto w-full max-w grid grid-rows-[240px_1fr] lg:grid-rows-[1fr] lg:grid-cols-[1fr_auto] lg:grow max-w-[1400px] min-h-[480px] game-frame">
         {/* Game area */}
         <div className="relative overflow-hidden bg-brown-900" ref={gameWrapperRef}>
-          <div className="absolute inset-0">
+          <div className={`absolute inset-0 ${!showMap ? 'invisible' : '' }`}>
             <div className="container">
               <Stage width={width} height={height} options={{ backgroundColor: 0x7ab5ff }}>
                 {/* Re-propagate context because contexts are not shared between renderers.
@@ -96,6 +102,7 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
               </Stage>
             </div>
           </div>
+          <div></div>
         </div>
         {/* Right column area */}
         <div
