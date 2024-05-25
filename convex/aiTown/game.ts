@@ -260,6 +260,7 @@ export class Game extends AbstractGame {
 
     // mark descriptions as werewolves
     for (var wwolf of werewolves) {
+      console.log(`player ${ wwolf.id } is a werewolf !`)
       const wwolfDescription = this.playerDescriptions.get(wwolf.id);
       if (wwolfDescription) {
         wwolfDescription.type = 'werewolf'

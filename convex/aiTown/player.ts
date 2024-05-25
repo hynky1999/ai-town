@@ -292,6 +292,8 @@ export const playerInputs = {
     },
     handler: (game, now, args) => {
       Player.join(game, now, args.name, args.character, args.description, args.type ,args.tokenIdentifier);
+      // Temporary role assignment for testing
+      game.assignRoles()
       return null;
     },
   }),
