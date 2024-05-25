@@ -23,6 +23,7 @@ export const serializedWorld = {
   gameCycle: v.object(gameCycleSchema),
   gameVotes: v.array(v.object(VotesSchema)),
   llmVotes: v.array(v.object(VotesSchema)),
+  winner: v.optional(v.union(v.literal('werewolves'), v.literal('villagers')))
 };
 export type SerializedWorld = ObjectType<typeof serializedWorld>;
 
@@ -35,6 +36,7 @@ export class World {
   gameCycle: GameCycle;
   gameVotes: Votes[];
   llmVotes: Votes[];
+  winner?: 'werewolves' | 'villagers' | undefined
 
   constructor(serialized: SerializedWorld) {
     const { nextId, historicalLocations } = serialized;
@@ -46,7 +48,8 @@ export class World {
     this.gameCycle = new GameCycle(serialized.gameCycle);
     this.gameVotes = serialized.gameVotes.map((v) => new Votes(v));
     this.llmVotes = serialized.llmVotes.map((v) => new Votes(v));
-
+    this.winner = serialized.winner;
+    
     if (historicalLocations) {
       this.historicalLocations = new Map();
       for (const { playerId, location } of historicalLocations) {
@@ -74,6 +77,7 @@ export class World {
       gameCycle: this.gameCycle.serialize(),
       gameVotes: this.gameVotes.map((v) => v.serialize()),
       llmVotes: this.llmVotes.map((v) => v.serialize()),
+      winner: this.winner,
     };
   }
 }

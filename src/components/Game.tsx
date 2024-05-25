@@ -10,6 +10,7 @@ import { useWorldHeartbeat } from '../hooks/useWorldHeartbeat.ts';
 import { useHistoricalTime } from '../hooks/useHistoricalTime.ts';
 import { DebugTimeManager } from './DebugTimeManager.tsx';
 import { GameId } from '../../convex/aiTown/ids.ts';
+import { Game as GameObj} from '../../convex/aiTown/game.ts';
 import { ServerGame, useServerGame } from '../hooks/serverGame.ts';
 import { VoteModal } from './VoteModal.tsx';
 import { GameCycle } from '../../convex/aiTown/gameCycle.ts';
@@ -19,8 +20,8 @@ import { World } from '../../convex/aiTown/world.ts';
 
 export const SHOW_DEBUG_UI = !!import.meta.env.VITE_SHOW_DEBUG_UI;
 
-export function GameStateLabel(gameCycle: GameCycle, me: PlayerDescription | undefined) {
-  switch (gameCycle.cycleState) {
+export function GameStateLabel(game: GameObj, me: PlayerDescription | undefined) {
+  switch (game.world.gameCycle.cycleState) {
     case 'Day':
       return {
         label: 'Day',
@@ -46,10 +47,11 @@ export function GameStateLabel(gameCycle: GameCycle, me: PlayerDescription | und
         label: 'Night',
         desc: me?.type === 'werewolf' ? 'Discuss who to kill with other warewolves' : 'Hide in your home!!',
       };
-    case 'LLMsVoting':
+    case 'EndGame':
       return {
-        label: 'LLM Vote',
-        desc: 'Vote for players that you think were LLMs',
+        label: 'The End',
+        // desc: 'Find out who won!',
+        desc: `Winners are ${ game.world.winner }!`,
       };
   }
 }
@@ -128,8 +130,8 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
           ref={scrollViewRef}
         >
           <div className="flex flex-col items-center mb-4">
-            <h2 className="text-2xl font-bold">{GameStateLabel(game.world.gameCycle, meDescription).label}</h2>
-            <p className="text-lg">{GameStateLabel(game.world.gameCycle, meDescription).desc}</p>
+            <h2 className="text-2xl font-bold">{GameStateLabel(game as GameObj, meDescription).label}</h2>
+            <p className="text-lg">{GameStateLabel(game as GameObj, meDescription).desc}</p>
           </div>
           {playerId && canVote(game, meDescription) ?  <VoteModal game={game} engineId={engineId} playerId={playerId} maxVotes={1} /> :
           <PlayerDetails

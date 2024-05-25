@@ -80,6 +80,8 @@ export class Game extends AbstractGame {
 
   numPathfinds: number;
 
+  // winner?: 'werewolves' | 'villagers' | undefined
+
   constructor(
     engine: Doc<'engines'>,
     public worldId: Id<'worlds'>,
@@ -193,59 +195,72 @@ export class Game extends AbstractGame {
   }
 
   tick(now: number) {
-    // update game cycle counter
-    this.world.gameCycle.tick(this, this.tickDuration);
-
-    for (const player of this.world.players.values()) {
-      player.tick(this, now);
-    }
-    for (const player of this.world.players.values()) {
-      player.tickPathfinding(this, now);
-    }
-    for (const player of this.world.players.values()) {
-      player.tickPosition(this, now);
-    }
-    for (const conversation of this.world.conversations.values()) {
-      conversation.tick(this, now);
-    }
-    for (const agent of this.world.agents.values()) {
-      agent.tick(this, now);
-    }
-
-    // Save each player's location into the history buffer at the end of
-    // each tick.
-    for (const player of this.world.players.values()) {
-      let historicalObject = this.historicalLocations.get(player.id);
-      if (!historicalObject) {
-        historicalObject = new HistoricalObject(locationFields, playerLocation(player));
-        this.historicalLocations.set(player.id, historicalObject);
+    if (this.world.gameCycle.cycleState != 'EndGame') {
+      // update game cycle counter
+      this.world.gameCycle.tick(this, this.tickDuration);
+  
+      for (const player of this.world.players.values()) {
+        player.tick(this, now);
       }
-      historicalObject.update(now, playerLocation(player));
-    }
+      for (const player of this.world.players.values()) {
+        player.tickPathfinding(this, now);
+      }
+      for (const player of this.world.players.values()) {
+        player.tickPosition(this, now);
+      }
+      for (const conversation of this.world.conversations.values()) {
+        conversation.tick(this, now);
+      }
+      for (const agent of this.world.agents.values()) {
+        agent.tick(this, now);
+      }
+  
+      // Save each player's location into the history buffer at the end of
+      // each tick.
+      for (const player of this.world.players.values()) {
+        let historicalObject = this.historicalLocations.get(player.id);
+        if (!historicalObject) {
+          historicalObject = new HistoricalObject(locationFields, playerLocation(player));
+          this.historicalLocations.set(player.id, historicalObject);
+        }
+        historicalObject.update(now, playerLocation(player));
+      }
+  
+      // Check for end game conditions
+      // are there any humans?
+      // we check for endgame if there's at least 1 human player
+      const humans = [...this.world.players.values()].filter(player => player.human)
+      if (humans.length > 0) {
+        // all 'werewolf' are dead -> villagers win
+        const werewolves = [...this.world.players.values()].filter(player => 
+          player.playerType(this) === 'werewolf'
+        )
+        if (werewolves.length === 0) {
+          // TODO finish game with villagers victory
+          // console.log('villagers win')
+          this.world.gameCycle.endgame()
+          this.world.winner = 'villagers'
+        }
+    
+        // just 1 'villager' left -> werewolves win
+        const villagers = [...this.world.players.values()].filter(player =>
+          player.playerType(this) ===  'villager'
+        )
+        if (villagers.length <= 1) {
+          // TODO finish game with werewolves victory
+          // console.log('werewolves win')
+          this.world.gameCycle.endgame()
+          this.world.winner = 'werewolves'
+        }
+      }
+  
+      // debug
+      // console.log(`we have ${ villagers.length } villagers`)
+      // console.log(`we have ${ werewolves.length } werewolves`)
+      // console.log(`we have ${ this.world.players.size } players`)
+      // console.log(`we have ${ humans.length } humans`)
 
-    // Check for end game conditions
-    // all 'werewolf' are dead -> villagers win
-    const werewolves = [...this.world.players.values()].filter(player => 
-      player.playerType(this) === 'werewolf'
-    )
-    if (werewolves.length === 0) {
-      // TODO finish game with villagers victory
-      // console.log('villagers win')
     }
-
-    // just 1 'villager' left -> werewolves win
-    const villagers = [...this.world.players.values()].filter(player =>
-      player.playerType(this) ===  'villager'
-    )
-    if (villagers.length <= 1) {
-      // TODO finish game with werewolves victory
-      // console.log('werewolves win')
-    }
-
-    // debug
-    // console.log(`we have ${ villagers.length } villagers`)
-    // console.log(`we have ${ werewolves.length } werewolves`)
-    // console.log(`we have ${ this.world.players.size } players`)
   }
 
   assignRoles() {

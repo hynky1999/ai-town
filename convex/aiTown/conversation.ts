@@ -146,7 +146,7 @@ export class Conversation {
       console.log(reason);
       return { error: reason };
     }
-    
+
     // Forbid villagers to talk in the night
     const { cycleState } = game.world.gameCycle;
     if (cycleState === 'Night' || cycleState === 'PlayerKillVoting') {
@@ -160,7 +160,6 @@ export class Conversation {
         return { error: reason };
       }
     }
-    // Don't invite villagers in the night
     const conversationId = game.allocId('conversations');
     console.log(`Creating conversation ${conversationId}`);
     game.world.conversations.set(
@@ -263,7 +262,7 @@ export const serializedConversation = {
     v.literal('Night'),
     v.literal('WerewolfVoting'),
     v.literal('PlayerKillVoting'),
-    v.literal('LLMsVoting'),
+    v.literal('EndGame'),
     v.literal('LobbyState'),
   ),
   isTyping: v.optional(

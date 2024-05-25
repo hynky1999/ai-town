@@ -71,18 +71,18 @@ export const ACTIVITIES = [
 ];
 
 export const ENGINE_ACTION_DURATION = 30000;
-export const DAY_DURATION = 60000;
-export const NIGHT_DURATION = 60000;
-export const WWOLF_VOTE_DURATION = 30000;
-export const PLAYER_KILL_VOTE_DURATION = 30000;
-export const LLM_VOTE_DURATION = 60000;
+// export const DAY_DURATION = 60000;
+// export const NIGHT_DURATION = 60000;
+// export const WWOLF_VOTE_DURATION = 30000;
+// export const PLAYER_KILL_VOTE_DURATION = 30000;
+// export const LLM_VOTE_DURATION = 60000;
 
 // Debugging
-// export const DAY_DURATION = 100;
-// export const NIGHT_DURATION = 100;
-// export const WWOLF_VOTE_DURATION = 100;
-// export const PLAYER_KILL_VOTE_DURATION = 100;
-// export const LLM_VOTE_DURATION = 100;
+export const DAY_DURATION = 5000;
+export const NIGHT_DURATION = 5000;
+export const WWOLF_VOTE_DURATION = 1000;
+export const PLAYER_KILL_VOTE_DURATION = 1000;
+export const LLM_VOTE_DURATION = 1000;
 
 // Bound the number of pathfinding searches we do per game step.
 export const MAX_PATHFINDS_PER_STEP = 16;

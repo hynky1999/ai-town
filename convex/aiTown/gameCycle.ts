@@ -9,14 +9,14 @@ import {
 } from '../constants';
 import { processVotes } from './voting';
 
-export type CycleState = 'Day' | 'Night' | 'WerewolfVoting' | 'PlayerKillVoting' | 'LLMsVoting' | 'LobbyState'
+export type CycleState = 'Day' | 'Night' | 'WerewolfVoting' | 'PlayerKillVoting' | 'EndGame' | 'LobbyState'
 
 const stateDurations: { [key in CycleState]: number } = {
   Day: DAY_DURATION, 
   Night: NIGHT_DURATION,   
   WerewolfVoting: WWOLF_VOTE_DURATION,
   PlayerKillVoting: PLAYER_KILL_VOTE_DURATION, 
-  LLMsVoting: LLM_VOTE_DURATION,     
+  EndGame: Infinity,     
   LobbyState: Infinity 
 };
 
@@ -35,7 +35,7 @@ export const gameCycleSchema = {
     v.literal('Night'),
     v.literal('WerewolfVoting'),
     v.literal('PlayerKillVoting'),
-    v.literal('LLMsVoting'),
+    v.literal('EndGame'),
     v.literal('LobbyState'),
   ),
   cycleIndex: v.number(),
@@ -77,6 +77,13 @@ export class GameCycle {
     this.cycleIndex = cycleIndex;
   }
 
+  endgame() {
+    this.currentTime = 0;
+    this.cycleState = 'EndGame';
+    this.cycleIndex = -1;
+    console.log('EndGame reached')
+  }
+
   // Tick method to increment the counter
   tick(game: Game, tickDuration: number) {
     this.currentTime += tickDuration;
@@ -88,7 +95,7 @@ export class GameCycle {
       this.cycleState = normalCycle[this.cycleIndex];
       onStateChange(prevState, this.cycleState, game, tickDuration);
     }
-}
+  }
 
 
   serialize(): SerializedGameCycle {
