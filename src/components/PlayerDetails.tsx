@@ -71,11 +71,10 @@ export default function PlayerDetails({
     humanConversation &&
     playerConversation &&
     humanConversation.id === playerConversation.id;
-
+  
   const humanStatus =
     humanPlayer && humanConversation && humanConversation.participants.get(humanPlayer.id)?.status;
   const playerStatus = playerConversation && playerConversation.participants.get(playerId)?.status;
-
   const haveInvite = sameConversation && humanStatus?.kind === 'invited';
   const waitingForAccept =
     sameConversation && playerConversation.participants.get(playerId)?.status.kind === 'invited';
@@ -224,7 +223,7 @@ export default function PlayerDetails({
       <div className="desc my-6">
         <p className="leading-tight -m-4 bg-brown-700 text-base sm:text-sm">
           {!isMe && playerDescription?.description}
-          {isMe && <i>This is you!</i>}
+          {isMe && <i>This is you! You are a {playerDescription?.type}</i>}
           {!isMe && inConversationWithMe && (
             <>
               <br />
