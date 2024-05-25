@@ -128,8 +128,8 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
           ref={scrollViewRef}
         >
           <div className="flex flex-col items-center mb-4">
-            <h2 className="text-2xl font-bold">{GameStateLabel(game.world.gameCycle).label, meDescription}</h2>
-            <p className="text-lg">{GameStateLabel(game.world.gameCycle).desc, meDescription}</p>
+            <h2 className="text-2xl font-bold">{GameStateLabel(game.world.gameCycle, meDescription).label}</h2>
+            <p className="text-lg">{GameStateLabel(game.world.gameCycle, meDescription).desc}</p>
           </div>
           {playerId && canVote(game, meDescription) ?  <VoteModal game={game} engineId={engineId} playerId={playerId} maxVotes={1} /> :
           <PlayerDetails
