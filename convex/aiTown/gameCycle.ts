@@ -46,13 +46,20 @@ export type SerializedGameCycle = ObjectType<typeof gameCycleSchema>;
 const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, now: number) => {
   console.log(`state changed: ${ prevState } -> ${ newState }`);
   if (prevState === 'PlayerKillVoting') {
-    const mostVotedPlayer = processVotes(game.world.gameVotes, [...game.world.players.values()])[0];
-    const playerToKill = game.world.players.get(mostVotedPlayer.playerId);
-    console.log(`killing: ${playerToKill?.id}, with ${game.world.gameVotes.length} votes`)
-    if (playerToKill) {
-      playerToKill.kill(game, now);
+    const werewolves = [...game.world.players.values()].filter(player => 
+      player.playerType(game) === 'werewolf'
+    )
+    if (werewolves.length > 0) {
+      const mostVotedPlayer = processVotes(game.world.gameVotes, [...game.world.players.values()])[0];
+      const playerToKill = game.world.players.get(mostVotedPlayer.playerId);
+      console.log(`killing: ${playerToKill?.id}, with ${game.world.gameVotes.length} votes`)
+      if (playerToKill) {
+        playerToKill.kill(game, now);
+      }
+      game.world.gameVotes = [];
+    } else {
+      console.log('no werevolves in the game, nobody was killed')
     }
-    game.world.gameVotes = [];
   }
   if (prevState === 'WerewolfVoting') {
     const mostVotedPlayer = processVotes(game.world.gameVotes, [...game.world.players.values()])[0];
