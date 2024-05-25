@@ -69,7 +69,7 @@ export class World {
           location,
         })),
       gameCycle: this.gameCycle.serialize(),
-      votes: this.votes,
+      votes: this.votes.serialize(),
     };
   }
 }
