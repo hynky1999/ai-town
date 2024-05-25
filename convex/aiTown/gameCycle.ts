@@ -9,7 +9,7 @@ import {
 } from '../constants';
 import { processVotes } from './voting';
 
-type CycleState = 'Day' | 'Night' | 'WerewolfVoting' | 'PlayerKillVoting' | 'LLMsVoting' | 'LobbyState'
+export type CycleState = 'Day' | 'Night' | 'WerewolfVoting' | 'PlayerKillVoting' | 'LLMsVoting' | 'LobbyState'
 
 const stateDurations: { [key in CycleState]: number } = {
   Day: DAY_DURATION, 

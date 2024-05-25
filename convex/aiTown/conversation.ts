@@ -11,11 +11,13 @@ import { Game } from './game';
 import { stopPlayer, blocked, movePlayer } from './movement';
 import { ConversationMembership, serializedConversationMembership } from './conversationMembership';
 import { parseMap, serializeMap } from '../util/object';
+import {CycleState} from './gameCycle'
 
 export class Conversation {
   id: GameId<'conversations'>;
   creator: GameId<'players'>;
   created: number;
+  cycleState:CycleState;
   isTyping?: {
     playerId: GameId<'players'>;
     messageUuid: string;
@@ -29,10 +31,11 @@ export class Conversation {
   participants: Map<GameId<'players'>, ConversationMembership>;
 
   constructor(serialized: SerializedConversation) {
-    const { id, creator, created, isTyping, lastMessage, numMessages, participants } = serialized;
+    const { id, creator, created, cycleState, isTyping, lastMessage, numMessages, participants } = serialized;
     this.id = parseGameId('conversations', id);
     this.creator = parseGameId('players', creator);
     this.created = created;
+    this.cycleState = cycleState;
     this.isTyping = isTyping && {
       playerId: parseGameId('players', isTyping.playerId),
       messageUuid: isTyping.messageUuid,
@@ -142,6 +145,7 @@ export class Conversation {
         id: conversationId,
         created: now,
         creator: player.id,
+        cycleState: game.world.gameCycle.cycleState,
         numMessages: 0,
         participants: [
           { playerId: player.id, invited: now, status: { kind: 'walkingOver' } },
@@ -149,6 +153,7 @@ export class Conversation {
         ],
       }),
     );
+    console.log(`Starting conversation during ${game.world.gameCycle.cycleState}`);
     return { conversationId };
   }
 
@@ -211,11 +216,12 @@ export class Conversation {
   }
 
   serialize(): SerializedConversation {
-    const { id, creator, created, isTyping, lastMessage, numMessages } = this;
+    const { id, creator, created, cycleState, isTyping, lastMessage, numMessages } = this;
     return {
       id,
       creator,
       created,
+      cycleState,
       isTyping,
       lastMessage,
       numMessages,
@@ -228,6 +234,14 @@ export const serializedConversation = {
   id: conversationId,
   creator: playerId,
   created: v.number(),
+  cycleState: v.union( 
+    v.literal('Day'),
+    v.literal('Night'),
+    v.literal('WerewolfVoting'),
+    v.literal('PlayerKillVoting'),
+    v.literal('LLMsVoting'),
+    v.literal('LobbyState'),
+  ),
   isTyping: v.optional(
     v.object({
       playerId,
