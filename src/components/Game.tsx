@@ -10,15 +10,16 @@ import { useWorldHeartbeat } from '../hooks/useWorldHeartbeat.ts';
 import { useHistoricalTime } from '../hooks/useHistoricalTime.ts';
 import { DebugTimeManager } from './DebugTimeManager.tsx';
 import { GameId } from '../../convex/aiTown/ids.ts';
-import { useServerGame } from '../hooks/serverGame.ts';
+import { ServerGame, useServerGame } from '../hooks/serverGame.ts';
 import { VoteModal } from './VoteModal.tsx';
 import { GameCycle } from '../../convex/aiTown/gameCycle.ts';
 import { PlayerDescription } from '../../convex/aiTown/playerDescription.ts';
 import { Cloud } from './Cloud.tsx';
+import { World } from '../../convex/aiTown/world.ts';
 
 export const SHOW_DEBUG_UI = !!import.meta.env.VITE_SHOW_DEBUG_UI;
 
-export function GameStateLabel(gameCycle: GameCycle) {
+export function GameStateLabel(gameCycle: GameCycle, me: PlayerDescription | undefined) {
   switch (gameCycle.cycleState) {
     case 'Day':
       return {
@@ -33,7 +34,7 @@ export function GameStateLabel(gameCycle: GameCycle) {
     case 'PlayerKillVoting':
       return {
         label: 'Player Kill Vote',
-        desc: 'Select a player to kill',
+        desc: me?.type === 'werewolf' ? 'Select a player to kill' : 'Hide in your home!!',
       };
     case 'LobbyState':
       return {
@@ -43,7 +44,7 @@ export function GameStateLabel(gameCycle: GameCycle) {
     case 'Night':
       return {
         label: 'Night',
-        desc: 'Choose a person to kill with other wares',
+        desc: me?.type === 'werewolf' ? 'Discuss who to kill with other warewolves' : 'Hide in your home!!',
       };
     case 'LLMsVoting':
       return {
@@ -53,8 +54,8 @@ export function GameStateLabel(gameCycle: GameCycle) {
   }
 }
 
-export function canVote(gameCycle: GameCycle, playerId: GameId<'players'> | undefined) {
-  return (gameCycle.cycleState === "WerewolfVoting" || gameCycle.cycleState === "PlayerKillVoting") && playerId;
+export function canVote(game: ServerGame, me: PlayerDescription | undefined) {
+  return me && (game.world.gameCycle.cycleState === "WerewolfVoting" || (game.world.gameCycle.cycleState === "PlayerKillVoting" && me.type === "werewolf"));
 }
 
 function showMap(gameCycle: GameCycle, me: PlayerDescription | undefined) {
@@ -127,10 +128,10 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
           ref={scrollViewRef}
         >
           <div className="flex flex-col items-center mb-4">
-            <h2 className="text-2xl font-bold">{GameStateLabel(game.world.gameCycle).label}</h2>
-            <p className="text-lg">{GameStateLabel(game.world.gameCycle).desc}</p>
+            <h2 className="text-2xl font-bold">{GameStateLabel(game.world.gameCycle).label, meDescription}</h2>
+            <p className="text-lg">{GameStateLabel(game.world.gameCycle).desc, meDescription}</p>
           </div>
-          {canVote(game.world.gameCycle, playerId) ?  <VoteModal game={game} engineId={engineId} playerId={playerId} maxVotes={1} /> :
+          {playerId && canVote(game, meDescription) ?  <VoteModal game={game} engineId={engineId} playerId={playerId} maxVotes={1} /> :
           <PlayerDetails
             worldId={worldId}
             engineId={engineId}
