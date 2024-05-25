@@ -26,6 +26,24 @@ import { HistoricalObject } from '../engine/historicalObject';
 import { AgentDescription, serializedAgentDescription } from './agentDescription';
 import { parseMap, serializeMap } from '../util/object';
 
+type WerewolfLookupTable = {
+  [key: number]: number;
+};
+
+const werewolfLookup: WerewolfLookupTable = {
+  8: 2,
+  9: 2,
+  10: 2,
+  11: 2,
+  12: 3,
+  13: 3,
+  14: 3,
+  15: 3,
+  16: 3,
+  17: 3,
+  18: 4
+};
+
 const gameState = v.object({
   world: v.object(serializedWorld),
   playerDescriptions: v.array(v.object(serializedPlayerDescription)),
@@ -204,6 +222,49 @@ export class Game extends AbstractGame {
       }
       historicalObject.update(now, playerLocation(player));
     }
+
+    // Check for end game conditions
+    // all 'werewolf' are dead -> villagers win
+    const werewolves = [...this.world.players.values()].filter(player => {
+      const description = this.playerDescriptions.get(player.id);
+      return description?.type === 'werewolf'
+    })
+    if (werewolves.length === 0) {
+      // TODO finish game with villagers victory
+      // console.log('villagers win')
+    }
+
+    // just 1 'villager' left -> werewolves win
+    const villagers = [...this.world.players.values()].filter(player => {
+      const description = this.playerDescriptions.get(player.id);
+      return description?.type === 'villager'
+    })
+    if (villagers.length <= 1) {
+      // TODO finish game with werewolves victory
+      // console.log('werewolves win')
+    }
+
+    // debug
+    // console.log(`we have ${ villagers.length } villagers`)
+    // console.log(`we have ${ werewolves.length } werewolves`)
+    // console.log(`we have ${ this.world.players.size } players`)
+  }
+
+  assignRoles() {
+    const players = [...this.world.players.values()];
+    for (let i = players.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [players[i], players[j]] = [players[j], players[i]];
+    };
+    const werewolves = players.slice(0, werewolfLookup[players.length]);
+
+    // mark descriptions as werewolves
+    for (var wwolf of werewolves) {
+      const wwolfDescription = this.playerDescriptions.get(wwolf.id);
+      if (wwolfDescription) {
+        wwolfDescription.type = 'werewolf'
+      }
+    };
   }
 
   async saveStep(ctx: ActionCtx, engineUpdate: EngineUpdate): Promise<void> {

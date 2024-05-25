@@ -47,15 +47,20 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
   console.log(`state changed: ${ prevState } -> ${ newState }`);
   if (prevState === 'PlayerKillVoting') {
     const mostVotedPlayer = processVotes(game.world.votes, [...game.world.players.values()])[0];
-    // TODO: Kill the player
-    const playerToKill = game.world.players.get(mostVotedPlayer)
+    const playerToKill = game.world.players.get(mostVotedPlayer);
     if (playerToKill != undefined) {
-      playerToKill.kill(game, now)
+      playerToKill.kill(game, now);
     }
   }
   if (prevState === 'WerewolfVoting') {
     const mostVotedPlayer = processVotes(game.world.votes, [...game.world.players.values()])[0];
-    // TODO: Check if most voted player is werewolf
+    const description = game.playerDescriptions.get(mostVotedPlayer);
+
+    if (description != undefined) {
+      if (description.type === 'werewolf') {
+        game.world.players.get(mostVotedPlayer)?.kill(game, now)
+      }
+    }
   }
   // TODO: Implement LLM voting
 };
