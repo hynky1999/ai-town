@@ -86,12 +86,6 @@ export default function Home() {
               Help
             </Button>
           </div>
-          <a href="https://a16z.com">
-            <img className="w-8 h-8 pointer-events-auto" src={a16zImg} alt="a16z" />
-          </a>
-          <a href="https://convex.dev">
-            <img className="w-20 h-8 pointer-events-auto" src={convexImg} alt="Convex" />
-          </a>
         </footer>
         <ToastContainer position="bottom-right" autoClose={2000} closeOnClick theme="dark" />
       </div>
