@@ -142,7 +142,7 @@ export class Game extends AbstractGame {
     const { _id, _creationTime, historicalLocations: _, ...world } = worldDoc;
     const playerDescriptions = playerDescriptionsDocs
       // Discard player descriptions for players that no longer exist.
-      .filter((d) => !!world.players.find((p) => p.id === d.playerId))
+      // .filter((d) => !!world.players.find((p) => p.id === d.playerId))
       .map(({ _id, _creationTime, worldId: _, ...doc }) => doc);
     const agentDescriptions = agentDescriptionsDocs
       .filter((a) => !!world.agents.find((p) => p.id === a.agentId))
@@ -258,6 +258,7 @@ export class Game extends AbstractGame {
       // console.log(`we have ${ villagers.length } villagers`)
       // console.log(`we have ${ werewolves.length } werewolves`)
       // console.log(`we have ${ this.world.players.size } players`)
+      // console.log(`we have ${ this.world.playersInit.size } initial players`)
       // console.log(`we have ${ humans.length } humans`)
 
     }
@@ -271,7 +272,7 @@ export class Game extends AbstractGame {
     };
     const werewolves = players.slice(0, werewolfLookup[players.length]);
 
-    // mark descriptions as werewolves
+    // mark as werewolves
     for (var wwolf of werewolves) {
       console.log(`player ${ wwolf.id } is a werewolf !`)
       const wwolfDescription = this.playerDescriptions.get(wwolf.id);

@@ -50,7 +50,6 @@ export function GameStateLabel(game: GameObj, me: PlayerDescription | undefined)
     case 'EndGame':
       return {
         label: 'The End',
-        // desc: 'Find out who won!',
         desc: `Winners are ${ game.world.winner }!`,
       };
   }

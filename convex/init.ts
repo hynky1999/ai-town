@@ -59,6 +59,7 @@ async function getOrCreateDefaultWorld(ctx: MutationCtx) {
     agents: [],
     conversations: [],
     players: [],
+    playersInit: [],
     // initialize game cycle counter
     gameCycle: {
       currentTime: 0,

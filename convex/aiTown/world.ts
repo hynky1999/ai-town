@@ -18,6 +18,7 @@ export const serializedWorld = {
   nextId: v.number(),
   conversations: v.array(v.object(serializedConversation)),
   players: v.array(v.object(serializedPlayer)),
+  playersInit: v.array(v.object(serializedPlayer)),
   agents: v.array(v.object(serializedAgent)),
   historicalLocations: v.optional(historicalLocations),
   gameCycle: v.object(gameCycleSchema),
@@ -31,6 +32,7 @@ export class World {
   nextId: number;
   conversations: Map<GameId<'conversations'>, Conversation>;
   players: Map<GameId<'players'>, Player>;
+  playersInit: Map<GameId<'players'>, Player>; // kept for voting purpose
   agents: Map<GameId<'agents'>, Agent>;
   historicalLocations?: Map<GameId<'players'>, ArrayBuffer>;
   gameCycle: GameCycle;
@@ -44,6 +46,7 @@ export class World {
     this.nextId = nextId;
     this.conversations = parseMap(serialized.conversations, Conversation, (c) => c.id);
     this.players = parseMap(serialized.players, Player, (p) => p.id);
+    this.playersInit = parseMap(serialized.playersInit, Player, (p) => p.id);
     this.agents = parseMap(serialized.agents, Agent, (a) => a.id);
     this.gameCycle = new GameCycle(serialized.gameCycle);
     this.gameVotes = serialized.gameVotes.map((v) => new Votes(v));
@@ -67,6 +70,7 @@ export class World {
       nextId: this.nextId,
       conversations: [...this.conversations.values()].map((c) => c.serialize()),
       players: [...this.players.values()].map((p) => p.serialize()),
+      playersInit: [...this.playersInit.values()].map((p) => p.serialize()),
       agents: [...this.agents.values()].map((a) => a.serialize()),
       historicalLocations:
         this.historicalLocations &&

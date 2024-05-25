@@ -231,6 +231,18 @@ export class Player {
         speed: 0,
       }),
     );
+    // add to duplicate players
+    game.world.playersInit.set(
+      playerId,
+      new Player({
+        id: playerId,
+        human: tokenIdentifier,
+        lastInput: now,
+        position,
+        facing,
+        speed: 0,
+      }),
+    );
     game.playerDescriptions.set(
       playerId,
       new PlayerDescription({
