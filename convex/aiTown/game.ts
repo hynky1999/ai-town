@@ -175,6 +175,9 @@ export class Game extends AbstractGame {
   }
 
   tick(now: number) {
+    // update game cycle counter
+    this.world.gameCycle.tick(this, this.tickDuration);
+
     for (const player of this.world.players.values()) {
       player.tick(this, now);
     }

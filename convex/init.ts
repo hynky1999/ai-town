@@ -58,6 +58,12 @@ async function getOrCreateDefaultWorld(ctx: MutationCtx) {
     agents: [],
     conversations: [],
     players: [],
+    // initialize game cycle counter
+    gameCycle: {
+      currentTime: 0,
+      cycleState: 'Day',
+      cycleIndex: 0,
+    }
   });
   const worldStatusId = await ctx.db.insert('worldStatus', {
     engineId: engineId,
@@ -77,6 +83,10 @@ async function getOrCreateDefaultWorld(ctx: MutationCtx) {
     tileDim: map.tiledim,
     bgTiles: map.bgtiles,
     objectTiles: map.objmap,
+    decorTiles: map.decors,
+    bgTilesN: map.bgtilesN,
+    objectTilesN: map.objmapN,
+    decorTilesN: map.decorsN,
     animatedSprites: map.animatedsprites,
   });
   await ctx.scheduler.runAfter(0, internal.aiTown.main.runStep, {

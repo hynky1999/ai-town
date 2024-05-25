@@ -27,7 +27,11 @@ export const serializedWorldMap = {
   // Tile size in pixels (assume square)
   tileDim: v.number(),
   bgTiles: v.array(v.array(v.array(v.number()))),
+  decorTiles: v.array(v.array(v.array(v.number()))),
   objectTiles: v.array(tileLayer),
+  bgTilesN: v.array(v.array(v.array(v.number()))),
+  decorTilesN: v.array(v.array(v.array(v.number()))),
+  objectTilesN: v.array(tileLayer),
   animatedSprites: v.array(v.object(animatedSprite)),
 };
 export type SerializedWorldMap = ObjectType<typeof serializedWorldMap>;
@@ -43,18 +47,27 @@ export class WorldMap {
   tileDim: number;
 
   bgTiles: TileLayer[];
+  decorTiles: TileLayer[];
   objectTiles: TileLayer[];
+  bgTilesN: TileLayer[];
+  decorTilesN: TileLayer[];
+  objectTilesN: TileLayer[];
   animatedSprites: AnimatedSprite[];
 
   constructor(serialized: SerializedWorldMap) {
     this.width = serialized.width;
     this.height = serialized.height;
     this.tileSetUrl = serialized.tileSetUrl;
+
     this.tileSetDimX = serialized.tileSetDimX;
     this.tileSetDimY = serialized.tileSetDimY;
     this.tileDim = serialized.tileDim;
     this.bgTiles = serialized.bgTiles;
+    this.decorTiles = serialized.decorTiles;
     this.objectTiles = serialized.objectTiles;
+    this.bgTilesN = serialized.bgTilesN;
+    this.decorTilesN = serialized.decorTilesN;
+    this.objectTilesN = serialized.objectTilesN;
     this.animatedSprites = serialized.animatedSprites;
   }
 
@@ -68,6 +81,10 @@ export class WorldMap {
       tileDim: this.tileDim,
       bgTiles: this.bgTiles,
       objectTiles: this.objectTiles,
+      decorTiles:this.decorTiles,
+      bgTilesN: this.bgTilesN,
+      objectTilesN: this.objectTilesN,
+      decorTilesN:this.decorTilesN,
       animatedSprites: this.animatedSprites,
     };
   }

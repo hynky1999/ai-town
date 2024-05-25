@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import { useApp } from '@pixi/react';
 import { Player, SelectElement } from './Player.tsx';
 import { useEffect, useRef, useState } from 'react';
-import { PixiStaticMap } from './PixiStaticMap.tsx';
+import PixiStaticMap from './PixiStaticMap.tsx';
 import PixiViewport from './PixiViewport.tsx';
 import { Viewport } from 'pixi-viewport';
 import { Id } from '../../convex/_generated/dataModel';
@@ -82,6 +82,30 @@ export const PixiGame = (props: {
   const { width, height, tileDim } = props.game.worldMap;
   const players = [...props.game.world.players.values()];
 
+  // State to manage the current tileSet
+  const [currentTileSet, setCurrentTileSet] = useState({
+    background: props.game.worldMap.bgTiles,
+    objectMap: props.game.worldMap.objectTiles,
+    decor: props.game.worldMap.decorTiles,
+  });
+
+  // Effect hook to change the tileSet based on a day/night condition
+  useEffect(() => {
+    const { cycleState } = props.game.world.gameCycle;
+    const tileSet = (cycleState === 'Day' || cycleState === 'Night')
+    ? {
+        background: props.game.worldMap.bgTiles,
+        objectMap: props.game.worldMap.objectTiles,
+        decor: props.game.worldMap.decorTiles,
+      }
+    : {
+        background: props.game.worldMap.bgTilesN,
+        objectMap: props.game.worldMap.objectTilesN,
+        decor: props.game.worldMap.decorTilesN,
+      };
+    setCurrentTileSet(tileSet);
+  }, [props.game.world.gameCycle.cycleState]);
+
   // Zoom on the user’s avatar when it is created
   useEffect(() => {
     if (!viewportRef.current || humanPlayerId === undefined) return;
@@ -103,7 +127,13 @@ export const PixiGame = (props: {
       viewportRef={viewportRef}
     >
       <PixiStaticMap
-        map={props.game.worldMap}
+        map={{ 
+          ...props.game.worldMap, 
+          bgTiles: currentTileSet.background, 
+          objectTiles: currentTileSet.objectMap,
+          decorTiles: currentTileSet.decor, 
+          serialize: props.game.worldMap.serialize 
+        }}
         onpointerup={onMapPointerUp}
         onpointerdown={onMapPointerDown}
       />
