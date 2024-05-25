@@ -11,7 +11,7 @@ import { Game } from './game';
 import { stopPlayer, blocked, movePlayer } from './movement';
 import { ConversationMembership, serializedConversationMembership } from './conversationMembership';
 import { parseMap, serializeMap } from '../util/object';
-import {CycleState} from './gameCycle'
+import {CycleState, gameCycleSchema} from './gameCycle'
 
 export class Conversation {
   id: GameId<'conversations'>;
@@ -257,14 +257,7 @@ export const serializedConversation = {
   id: conversationId,
   creator: playerId,
   created: v.number(),
-  cycleState: v.union( 
-    v.literal('Day'),
-    v.literal('Night'),
-    v.literal('WerewolfVoting'),
-    v.literal('PlayerKillVoting'),
-    v.literal('EndGame'),
-    v.literal('LobbyState'),
-  ),
+  cycleState: gameCycleSchema.cycleState,
   isTyping: v.optional(
     v.object({
       playerId,
