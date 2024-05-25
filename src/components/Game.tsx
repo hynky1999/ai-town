@@ -17,6 +17,9 @@ import { GameCycle } from '../../convex/aiTown/gameCycle.ts';
 import { PlayerDescription } from '../../convex/aiTown/playerDescription.ts';
 import { Cloud } from './Cloud.tsx';
 import { World } from '../../convex/aiTown/world.ts';
+import VotingPopover from './VotingPopover.tsx';
+import { FooterPortal } from './FooterContext.tsx';
+import { createPortal } from 'react-dom';
 
 export const SHOW_DEBUG_UI = !!import.meta.env.VITE_SHOW_DEBUG_UI;
 
@@ -71,6 +74,7 @@ export default function Game() {
     id: GameId<'players'>;
   }>();
   const [gameWrapperRef, { width, height }] = useElementSize();
+  const [votes, setVotes] = useState<GameId<'players'>[]>([]);
 
   const worldStatus = useQuery(api.world.defaultWorldStatus);
   const worldId = worldStatus?.worldId;
@@ -128,11 +132,11 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
           className="flex flex-col overflow-y-auto shrink-0 px-4 py-6 sm:px-6 lg:w-96 xl:pr-6 border-t-8 sm:border-t-0 sm:border-l-8 border-brown-900  bg-brown-800 text-brown-100"
           ref={scrollViewRef}
         >
-          <div className="flex flex-col items-center mb-4">
+          <div className="flex flex-col items-center mb-4 gap-4">
             <h2 className="text-2xl font-bold">{GameStateLabel(game as GameObj, meDescription).label}</h2>
-            <p className="text-lg">{GameStateLabel(game as GameObj, meDescription).desc}</p>
+            <p className="text-lg text-center">{GameStateLabel(game as GameObj, meDescription).desc}</p>
           </div>
-          {playerId && canVote(game, meDescription) ?  <VoteModal game={game} engineId={engineId} playerId={playerId} maxVotes={1} /> :
+          {playerId && canVote(game, meDescription) ?  <VoteModal compact={false} game={game} engineId={engineId} playerId={playerId} maxVotes={1} votes={votes} onVote={setVotes} /> :
           <PlayerDetails
             worldId={worldId}
             engineId={engineId}
@@ -144,6 +148,12 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
 }
         </div>
       </div>
+      {createPortal(
+          <div className="max-w-[1400px] mx-auto">
+        {playerId && <VotingPopover engineId={engineId} game={game} playerId={playerId} />}
+          </div>,
+          document.getElementById('footer-buttons')
+      )}
     </>
   );
 }

@@ -32,14 +32,18 @@ export const VoteModal = ({
   game,
   playerId,
   maxVotes=1,
+  votes,
+  onVote,
+  compact
 }: {
   engineId: Id<'engines'>,
   game: ServerGame,
   playerId: GameId<'players'>,
   maxVotes: number,
-
+  votes: GameId<'players'>[],
+  onVote: (votes: GameId<'players'>[]) => void,
+  compact: boolean
 }) => {
-  const [votes, setVotes] = useState<GameId<'players'>[]>([]);
   const inputVote = useSendInput(engineId, "gameVote");
   const vote = (playerId: GameId<'players'>) => {
     let newVotes = votes;
@@ -53,7 +57,7 @@ export const VoteModal = ({
       newVotes = newVotes.slice(1);
     }
     console.log(`votes: ${newVotes.map((vote) => game.playerDescriptions.get(vote)?.name).join(", ")}`)
-    setVotes(newVotes);
+    onVote(newVotes);
     inputVote({voter: playerId, votedPlayerIds: newVotes});
   }
   const [spriteSheet, setSpriteSheet] = useState<Spritesheet>();
@@ -73,7 +77,7 @@ export const VoteModal = ({
   }, []);
   const selectablePlayers = getSelectablePlayers(game, playerId);
   return (
-    <>
+    <div className={`flex gap-4 ${compact ? "flex-col" : "flex-wrap justify-center"}`}>
       {selectablePlayers.map((playable) => {
         const playerDesc = game.playerDescriptions.get(playable.id);
         const character = characters.find((c) => c.name === playerDesc?.character);
@@ -82,7 +86,7 @@ export const VoteModal = ({
         return (
           <>
             <Button onClick={() => vote(playable.id)}
-            className="lg:block border-2 border-gold"
+            className="lg:block border-2 border-gold min-w-[100px]"
             title={playerDesc?.name}
             selected={selected}
             key={playable.id}
@@ -98,7 +102,7 @@ export const VoteModal = ({
           </>
         )
       })}
-    </>
+    </div>
   )
   
 
