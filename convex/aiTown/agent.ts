@@ -256,6 +256,22 @@ export class Agent {
     };
   }
 
+  kill(game: Game, now: number) {
+    console.log(`agent ${ this.id } is killed`)
+
+    // Remove schedule operation if any.
+    const operationId = this.inProgressOperation?.operationId;
+    if (operationId !== undefined) {
+      const index = game.pendingOperations.findIndex(op => op.args[0] === operationId);
+    
+      if (index !== -1) {
+        game.pendingOperations.splice(index, 1);
+      }
+    }
+
+    game.world.agents.delete(this.id);
+  }
+
   serialize(): SerializedAgent {
     return {
       id: this.id,

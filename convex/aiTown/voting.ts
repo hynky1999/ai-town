@@ -53,6 +53,6 @@ export const processVotes = (votes: Votes, players: Player[], k: number = 1) => 
 
   const sortedVoteCounts = Object.entries(voteCounts).sort((a, b) => b[1] - a[1]);
   const topKPlayers = sortedVoteCounts.slice(0, k).map(entry => entry[0]);
-  return topKPlayers;
+  return topKPlayers as GameId<'players'>[];
   }
 

@@ -248,6 +248,22 @@ export class Player {
     game.world.players.delete(this.id);
   }
 
+  kill(game: Game, now: number) {
+    const playerId = this.id
+    console.log(`player ${ playerId } is killed`)
+    // first leave:
+    this.leave(game, now)
+
+    // if the player is npc, kill agent as well
+    const agent = [...game.world.agents.values()].find(
+      agent => agent.playerId === playerId
+    )
+
+    if (agent) {
+      agent.kill(game, now)
+    }
+  }
+
   serialize(): SerializedPlayer {
     const { id, human, pathfinding, activity, lastInput, position, facing, speed } = this;
     return {

@@ -43,11 +43,15 @@ export const gameCycleSchema = {
 
 export type SerializedGameCycle = ObjectType<typeof gameCycleSchema>;
 
-const onStateChange = (prevState: CycleState, newState: CycleState, game: Game) => {
+const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, now: number) => {
   console.log(`state changed: ${ prevState } -> ${ newState }`);
   if (prevState === 'PlayerKillVoting') {
     const mostVotedPlayer = processVotes(game.world.votes, [...game.world.players.values()])[0];
     // TODO: Kill the player
+    const playerToKill = game.world.players.get(mostVotedPlayer)
+    if (playerToKill != undefined) {
+      playerToKill.kill(game, now)
+    }
   }
   if (prevState === 'WerewolfVoting') {
     const mostVotedPlayer = processVotes(game.world.votes, [...game.world.players.values()])[0];
@@ -77,7 +81,7 @@ export class GameCycle {
       this.currentTime = 0;
       this.cycleIndex = (this.cycleIndex + 1) % normalCycle.length;
       this.cycleState = normalCycle[this.cycleIndex];
-      onStateChange(prevState, this.cycleState, game);
+      onStateChange(prevState, this.cycleState, game, tickDuration);
     }
 }
 
