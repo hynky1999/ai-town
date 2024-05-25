@@ -10,10 +10,12 @@ import { useHistoricalValue } from '../hooks/useHistoricalValue.ts';
 import { PlayerDescription } from '../../convex/aiTown/playerDescription.ts';
 import { WorldMap } from '../../convex/aiTown/worldMap.ts';
 import { ServerGame } from '../hooks/serverGame.ts';
+import { useEffect,useState } from 'react';
 
 export type SelectElement = (element?: { kind: 'player'; id: GameId<'players'> }) => void;
 
 const logged = new Set<string>();
+
 
 export const Player = ({
   game,
@@ -30,11 +32,30 @@ export const Player = ({
   historicalTime?: number;
 }) => {
   const playerCharacter = game.playerDescriptions.get(player.id)?.character;
+  console.log(playerCharacter)
   if (!playerCharacter) {
     throw new Error(`Player ${player.id} has no character`);
   }
-  const character = characters.find((c) => c.name === playerCharacter);
+ let initcharacter = characters.find((c) => c.name === playerCharacter);
 
+  const [currentSprite, setCurrentSprite] = useState({
+    sprite: playerCharacter
+  });
+  const [currentcaracter, setCurrentcaracter] = useState({initcharacter});
+  const  [previousSprite, setpreviousSprite] = useState({
+    sprite: playerCharacter
+  });
+   // Effect hook to change the tileSet based on a day/night condition
+   useEffect(() => {
+    const { cycleState } = game.world.gameCycle;
+    const tileSet = (cycleState === 'Day' || cycleState === 'Night') ? previousSprite : { sprite: "c1" };
+    setCurrentSprite(tileSet);
+   
+    let character = characters.find((c) => c.name === currentSprite.sprite);
+    setCurrentcaracter(character)
+  }, [game.world.gameCycle.cycleState, previousSprite]);
+  let character = characters.find((c) => c.name === currentSprite.sprite);
+  
   const locationBuffer = game.world.historicalLocations?.get(player.id);
   const historicalLocation = useHistoricalValue<Location>(
     locationFields,
@@ -42,7 +63,7 @@ export const Player = ({
     playerLocation(player),
     locationBuffer,
   );
-  if (!character) {
+  if (!currentSprite?.sprite) {
     if (!logged.has(playerCharacter)) {
       logged.add(playerCharacter);
       toast.error(`Unknown character ${playerCharacter}`);
@@ -79,9 +100,9 @@ export const Player = ({
             : undefined
         }
         isViewer={isViewer}
-        textureUrl={character.textureUrl}
-        spritesheetData={character.spritesheetData}
-        speed={character.speed}
+        textureUrl={currentcaracter?.textureUrl}
+        spritesheetData={currentcaracter?.sheetData}
+        speed={currentcaracter?.speed}
         onClick={() => {
           onClick({ kind: 'player', id: player.id });
         }}
