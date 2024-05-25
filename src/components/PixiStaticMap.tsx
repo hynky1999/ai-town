@@ -158,7 +158,8 @@ const PixiStaticMap = React.memo(
   (prevProps, nextProps) => {
     return (
       prevProps.map.bgTiles === nextProps.map.bgTiles &&
-      prevProps.map.objectTiles === nextProps.map.objectTiles
+      prevProps.map.objectTiles === nextProps.map.objectTiles &&
+      prevProps.map.decorTiles === nextProps.map.decorTiles
     );
   }
 );

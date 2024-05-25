@@ -92,16 +92,16 @@ export const PixiGame = (props: {
   // Effect hook to change the tileSet based on a day/night condition
   useEffect(() => {
     const { cycleState } = props.game.world.gameCycle;
-    const tileSet = (cycleState === 'Day' || cycleState === 'Night')
+    const tileSet = (cycleState === 'Night' || cycleState === 'PlayerKillVoting')
     ? {
-        background: props.game.worldMap.bgTiles,
-        objectMap: props.game.worldMap.objectTiles,
-        decor: props.game.worldMap.decorTiles,
-      }
-    : {
         background: props.game.worldMap.bgTilesN,
         objectMap: props.game.worldMap.objectTilesN,
         decor: props.game.worldMap.decorTilesN,
+      }
+    : {
+        background: props.game.worldMap.bgTiles,
+        objectMap: props.game.worldMap.objectTiles,
+        decor: props.game.worldMap.decorTiles,
       };
     setCurrentTileSet(tileSet);
   }, [props.game.world.gameCycle.cycleState]);

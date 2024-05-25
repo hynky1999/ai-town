@@ -23,8 +23,8 @@ const stateDurations: { [key in CycleState]: number } = {
 const normalCycle: CycleState[] = [
   'Day',
   'Night',
-  'WerewolfVoting',
   'PlayerKillVoting',
+  'WerewolfVoting',
 ];
 
 
