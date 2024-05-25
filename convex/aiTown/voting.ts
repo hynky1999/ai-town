@@ -64,7 +64,12 @@ export const processVotes = (votes: Votes[], players: Player[], k: number = 1) =
 
   // This can mean that warevolves can each other but whatever
   const sortedVoteCounts = Object.entries(voteCounts).sort((a, b) => b[1] - a[1]);
-  const topKPlayers = sortedVoteCounts.slice(0, k).map(entry => entry[0]);
-  return topKPlayers as GameId<'players'>[];
-  }
+  const topKPlayers = sortedVoteCounts.slice(0, k).map((val) => {
+    return {
+      playerId: val[0] as GameId<'players'>,
+      voteCount: val[1],
+    };
+  });
+  return topKPlayers;
+}
 

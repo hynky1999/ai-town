@@ -47,17 +47,21 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
   console.log(`state changed: ${ prevState } -> ${ newState }`);
   if (prevState === 'PlayerKillVoting') {
     const mostVotedPlayer = processVotes(game.world.gameVotes, [...game.world.players.values()])[0];
-    const playerToKill = game.world.players.get(mostVotedPlayer);
+    const playerToKill = game.world.players.get(mostVotedPlayer.playerId);
+    console.log(`killing: ${playerToKill?.id}, with ${game.world.gameVotes.length} votes`)
     if (playerToKill) {
       playerToKill.kill(game, now);
     }
+    game.world.gameVotes = [];
   }
   if (prevState === 'WerewolfVoting') {
     const mostVotedPlayer = processVotes(game.world.gameVotes, [...game.world.players.values()])[0];
-    const suspect = game.world.players.get(mostVotedPlayer)
+    const suspect = game.world.players.get(mostVotedPlayer.playerId);
+    console.log(`suspect: ${suspect?.id}, with ${game.world.gameVotes.length} votes`)
     if (suspect?.playerType(game) === 'werewolf') {
       suspect?.kill(game, now)
     }
+    game.world.gameVotes = [];
   }
 };
 

@@ -21,7 +21,7 @@ const getSelectablePlayers = (game: ServerGame, playerId: GameId<'players'>) => 
 
   else if (game.world.gameCycle.cycleState === "PlayerKillVoting") {
     return [...game.world.players.values()].filter(
-      (player) => (player.id !== playerId) && game.playerDescriptions.get(player.id)?.type === 'werewolf'
+      (player) => (player.id !== playerId) && game.playerDescriptions.get(player.id)?.type === 'villager'
     );
   }
   return []
@@ -52,6 +52,7 @@ export const VoteModal = ({
       // Removed the first vote and add the new vote
       newVotes = newVotes.slice(1);
     }
+    console.log(`votes: ${newVotes.map((vote) => game.playerDescriptions.get(vote)?.name).join(", ")}`)
     setVotes(newVotes);
     inputVote({voter: playerId, votedPlayerIds: newVotes});
   }
@@ -82,12 +83,12 @@ export const VoteModal = ({
           <>
             <Button onClick={() => vote(playable.id)}
             className="lg:block border-2 border-gold"
-            title={character?.name}
+            title={playerDesc?.name}
             selected={selected}
             key={playable.id}
             disabled={selected}
             >
-              {character?.name}
+              {playerDesc?.name}
               <Stage width={30} height={40} options={{backgroundAlpha: 0.0}}>
                 {
                   spriteSheet && <Character textureUrl={character.textureUrl} isViewer={true} spritesheetData={character.spritesheetData} x={15} y={15} orientation={0} onClick={() => {} } />
