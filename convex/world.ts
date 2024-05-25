@@ -135,6 +135,8 @@ export const joinWorld = mutation({
       description: `${DEFAULT_NAME} is a human player`,
       // description: `${identity.givenName} is a human player`,
       tokenIdentifier: DEFAULT_NAME,
+      // By default everybody is a villager
+      type: 'villager',
     });
   },
 });

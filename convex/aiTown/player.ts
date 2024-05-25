@@ -14,7 +14,7 @@ import { Game } from './game';
 import { stopPlayer, findRoute, blocked, movePlayer } from './movement';
 import { inputHandler } from './inputHandler';
 import { characters } from '../../data/characters';
-import { PlayerDescription } from './playerDescription';
+import { CharacterType, CharacterTypeSchema, PlayerDescription } from './playerDescription';
 
 const pathfinding = v.object({
   destination: point,
@@ -171,6 +171,7 @@ export class Player {
     name: string,
     character: string,
     description: string,
+    type: CharacterType,
     tokenIdentifier?: string,
   ) {
     if (tokenIdentifier) {
@@ -231,6 +232,7 @@ export class Player {
         character,
         description,
         name,
+        type,
       }),
     );
     game.descriptionsModified = true;
@@ -286,9 +288,10 @@ export const playerInputs = {
       character: v.string(),
       description: v.string(),
       tokenIdentifier: v.optional(v.string()),
+      type: CharacterTypeSchema
     },
     handler: (game, now, args) => {
-      Player.join(game, now, args.name, args.character, args.description, args.tokenIdentifier);
+      Player.join(game, now, args.name, args.character, args.description, args.type ,args.tokenIdentifier);
       return null;
     },
   }),

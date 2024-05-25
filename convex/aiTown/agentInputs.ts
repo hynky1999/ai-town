@@ -8,6 +8,7 @@ import { point } from '../util/types';
 import { Descriptions } from '../../data/characters';
 import { AgentDescription } from './agentDescription';
 import { Agent } from './agent';
+import { CharacterTypeSchema } from './playerDescription';
 
 export const agentInputs = {
   finishRememberConversation: inputHandler({
@@ -119,6 +120,7 @@ export const agentInputs = {
   createAgent: inputHandler({
     args: {
       descriptionIndex: v.number(),
+      type: CharacterTypeSchema
     },
     handler: (game, now, args) => {
       const description = Descriptions[args.descriptionIndex];
@@ -128,6 +130,7 @@ export const agentInputs = {
         description.name,
         description.character,
         description.identity,
+        args.type,
       );
       const agentId = game.allocId('agents');
       game.world.agents.set(

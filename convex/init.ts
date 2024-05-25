@@ -32,6 +32,7 @@ const init = mutation({
       for (let i = 0; i < toCreate; i++) {
         await insertInput(ctx, worldStatus.worldId, 'createAgent', {
           descriptionIndex: i % Descriptions.length,
+          type: 'villager',
         });
       }
     }
