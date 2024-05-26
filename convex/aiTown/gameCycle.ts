@@ -7,7 +7,9 @@ import {
   PLAYER_KILL_VOTE_DURATION,
   LLM_VOTE_DURATION,
 } from '../constants';
+import { LLMMessage, chatCompletion } from '../util/llm';
 import { processVotes } from './voting';
+import { HfInference } from "@huggingface/inference";
 
 export type CycleState = 'Day' | 'Night' | 'WerewolfVoting' | 'PlayerKillVoting' | 'EndGame' | 'LobbyState'
 
@@ -45,6 +47,49 @@ export type SerializedGameCycle = ObjectType<typeof gameCycleSchema>;
 
 const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, now: number) => {
   console.log(`state changed: ${ prevState } -> ${ newState }`);
+  console.log("newState is :",newState)
+  if(newState ==="WerewolfVoting"){
+    console.log('players are : ', game.playerDescriptions);
+    const werewolves = [...game.playerDescriptions.values()].filter(player => 
+      player.type === 'werewolf'
+    );
+    const villagers = [...game.playerDescriptions.values()].filter(player => 
+      player.type === 'villager'
+    );
+    console.log('Non-werewolf players: ', villagers);
+    console.log('werewolf players: ', werewolves);
+    // Call the function for each werewolf
+   
+  // Define a function to handle the asynchronous calls
+  const handleAsyncCalls = async () => {
+    // Call the async function for each werewolf
+    for (const werewolf of werewolves) {
+        const result = await LLmvotingCallWerewolf(werewolf, villagers);
+        processFc(result,game)
+    }
+  };
+
+  // Call the function to handle the asynchronous calls
+  handleAsyncCalls();   
+  }
+  if(newState ==="PlayerKillVoting"){
+    console.log('players are : ', game.playerDescriptions);
+    const werewolves = [...game.playerDescriptions.values()].filter(player => 
+      player.type === 'werewolf'
+    );
+    const villagers = [...game.playerDescriptions.values()]
+  const handleAsyncCalls = async () => {
+    // Call the async function for each werewolf
+    for (const villager of villagers) {
+       const result =  await LLmvotingCallAll( villagers);
+       processFc(result,game)
+    }
+  };
+
+  // Call the function to handle the asynchronous calls
+  handleAsyncCalls(); 
+
+  }
   if (prevState === 'PlayerKillVoting') {
     const werewolves = [...game.world.players.values()].filter(player => 
       player.playerType(game) === 'werewolf'
@@ -71,6 +116,110 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
     game.world.gameVotes = [];
   }
 };
+function processFc(log, game) {
+  try {
+    if (log.arguments && log.arguments.character) {
+      console.log('Voted to eliminate villager: ', log.arguments.character);
+    } else {
+      const players = game.playerDescriptions.values();
+      const characters = [...players].map(player => player.character); 
+      const randomCharacter = characters[Math.floor(Math.random() * characters.length)];
+      console.log('Voted to eliminate villager: ', randomCharacter);
+    }
+  } catch (error) {
+    const players = game.playerDescriptions.values();
+    const characters = [...players].map(player => player.character); 
+    const randomCharacter = characters[Math.floor(Math.random() * characters.length)]; 
+    console.log('Voted to eliminate villager: ', randomCharacter);
+  }
+}
+
+
+export async function LLmvotingCallWerewolf(werewolf,villagers) {
+  const inference = new HfInference("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");
+  const params = {
+    model: "tgi",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a werewolf and shall eliminate someone based on a conversation. You shall eliminate villagers. Don't make assumptions about what values to plug into functions. You MUST call a tool",
+      },
+      { role: "user", content: `Who do you want to eliminate between the following player ? \n players : ${villagers} \n ` },
+    ],
+    max_tokens: 500,
+    tool_choice: "auto",
+    tools: [
+      {
+        type: "function",
+        function: {
+          name: "vote_player",
+          description: "A function to chose on who to kicked out",
+          parameters: {
+            type: "object",
+            properties: {
+              character: { type: "string", description: "The character name of the player to eliminate. ( eg : f1, f2, f3 etc ...)" },
+
+            },
+            required: ["character"],
+          },
+        },
+      },
+    ],
+  };
+  // Streaming chat completion API
+const llama3 = inference.endpoint(
+	"https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions"
+);
+
+const response = await llama3.chatCompletion(params);
+console.log(response.choices[0].message.tool_calls[0].function)
+
+return response.choices[0].message.tool_calls[0].function
+  
+}
+export async function LLmvotingCallAll(villagers) {
+  const inference = new HfInference("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");
+  const params = {
+    model: "tgi",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a villager and shall try to eliminate someone based on a conversation. You shall eliminate werewolves. Don't make assumptions about what values to plug into functions. You MUST call a tool",
+      },
+      { role: "user", content: `Who do you want to eliminate between the following player ? \n players : ${villagers} \n ` },
+    ],
+    max_tokens: 500,
+    tool_choice: "auto",
+    tools: [
+      {
+        type: "function",
+        function: {
+          name: "vote_player",
+          description: "A function to chose on who to kicked out",
+          parameters: {
+            type: "object",
+            properties: {
+              character: { type: "string", description: "The character name of the player to eliminate. ( eg : f1, f2, f3 etc ...)" },
+
+            },
+            required: ["character"],
+          },
+        },
+      },
+    ],
+  };
+  // Streaming chat completion API
+const llama3 = inference.endpoint(
+	"https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions"
+);
+
+const response = await llama3.chatCompletion(params);
+console.log(response.choices[0].message.tool_calls[0].function)
+return response.choices[0].message.tool_calls[0].function.arguments
+  
+}
 
 export class GameCycle {
   currentTime: number;
