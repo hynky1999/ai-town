@@ -26,9 +26,9 @@ export default function LLMVote(
 ) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [votes, setVotes] = useState<GameId<'players'>[]>([]);
+  const players = [...game.world.playersInit.values()]
   const inputVote = useSendInput(engineId, "llmVote");
-
-  const maxVotes = 10
+  const totalLLMs = players.filter((player) => !player.human).length
   return (
     <>
       <Button onClick={() => setIsModalOpen(true)} className="lg:block">
@@ -49,12 +49,12 @@ export default function LLMVote(
           },
         }}
       >
-        <h2 className="text-2xl font-bold text-center mb-8">Which players are LLMs ? (Choose up to {maxVotes} players)</h2>
+        <h2 className="text-2xl font-bold text-center mb-8">Which players are LLMs ? (Choose up to {totalLLMs} players)</h2>
         <div className="max-w-[600px] w-full mx-auto">
-          <VoteModal compact={false} votes={votes} onVote={(newVotes) => {
+          <VoteModal compact={false} votes={votes} players={players} onVote={(newVotes) => {
             setVotes(newVotes)
             inputVote({voter: playerId, votedPlayerIds: newVotes});
-          }} engineId={engineId} game={game} playerId={playerId} maxVotes={10} />
+          }} engineId={engineId} game={game} playerId={playerId} maxVotes={totalLLMs} />
         </div>
       </Modal>
     </>
