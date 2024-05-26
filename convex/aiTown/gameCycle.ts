@@ -115,7 +115,7 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
     })
   };
   if (prevState === 'PlayerKillVoting') {
-    // const werewolves = [...game.world.players.values()].filter((were) => {
+// const werewolves = [...game.world.players.values()].filter((were) => {
     //   game.playerDescriptions.get(were.id)?.type === 'werewolf'
     // })
     // if (werewolves.length != 0) {
@@ -125,7 +125,7 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
     if (playerToKill) {
       playerToKill.kill(game, now);
     }
-    // } else {
+// } else {
     //   console.log('no werewolves, nobody was killed')
     // }
     game.world.gameVotes = [];
@@ -187,6 +187,7 @@ export class GameCycle {
 
   // Tick method to increment the counter
   tick(game: Game, tickDuration: number) {
+    console.log(process.env.GITHUB_TOKEN)
     this.currentTime += tickDuration;
 
     if (this.currentTime >= stateDurations[this.cycleState]) {

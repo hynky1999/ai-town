@@ -14,18 +14,18 @@ export type MapProps = {
 };
 
 const animations = {
-  'campfire.json': { spritesheet: campfire, url: '/ai-town/assets/spritesheets/campfire.png' },
+  'campfire.json': { spritesheet: campfire, url: '/assets/spritesheets/campfire.png' },
   'gentlesparkle.json': {
     spritesheet: gentlesparkle,
-    url: '/ai-town/assets/spritesheets/gentlesparkle32.png',
+    url: '/assets/spritesheets/gentlesparkle32.png',
   },
   'gentlewaterfall.json': {
     spritesheet: gentlewaterfall,
-    url: '/ai-town/assets/spritesheets/gentlewaterfall32.png',
+    url: '/assets/spritesheets/gentlewaterfall32.png',
   },
-  'windmill.json': { spritesheet: windmill, url: '/ai-town/assets/spritesheets/windmill.png' },
+  'windmill.json': { spritesheet: windmill, url: '/assets/spritesheets/windmill.png' },
   'gentlesplash.json': { spritesheet: gentlesplash,
-    url: '/ai-town/assets/spritesheets/gentlewaterfall32.png',},
+    url: '/assets/spritesheets/gentlewaterfall32.png',},
 };
 
 const createTiles = (map: WorldMap) => {

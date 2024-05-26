@@ -92,7 +92,7 @@ export default function Game() {
   const scrollViewRef = useRef<HTMLDivElement>(null);
 
   const humanTokenIdentifier = useQuery(api.world.userStatus, worldId ? { worldId } : 'skip');
-  if (!worldId || !engineId || !game || !humanTokenIdentifier) {
+  if (!worldId || !engineId || !game ) {
     return null;
   }
   const playerId = [...game.world.players.values()].find(

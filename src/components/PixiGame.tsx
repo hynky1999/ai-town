@@ -27,14 +27,13 @@ export const PixiGame = (props: {
   // PIXI setup.
   const pixiApp = useApp();
   const viewportRef = useRef<Viewport | undefined>();
-
-  const humanTokenIdentifier = useQuery(api.world.userStatus, { worldId: props.worldId }) ?? null;
+  const oauth = JSON.parse(localStorage.getItem('oauth'));
+  const oauthToken = oauth ? oauth.userInfo.fullname : undefined;
+  const humanTokenIdentifier = useQuery(api.world.userStatus, { worldId: props.worldId, oauthToken }) ?? null;
   const humanPlayerId = [...props.game.world.players.values()].find(
     (p) => p.human === humanTokenIdentifier,
   )?.id;
 
-
-  
   const moveTo = useSendInput(props.engineId, 'moveTo');
 
   // Interaction for clicking on the world to navigate.

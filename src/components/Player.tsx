@@ -30,11 +30,11 @@ export const Player = ({
   historicalTime?: number;
 }) => {
   const playerCharacter = game.playerDescriptions.get(player.id)?.character;
-    if (!playerCharacter) {
+  if (!playerCharacter) {
     throw new Error(`Player ${player.id} has no character`);
   }
   let character = characters.find((c) => c.name === playerCharacter);
-  // If it's night, use the night version of the character
+// If it's night, use the night version of the character
   if (game.world.gameCycle.cycleState === 'Night' && game.playerDescriptions.get(player.id)?.type === 'werewolf') {
     character = characters.find((c) => c.name === 'c1');
   }
@@ -45,7 +45,7 @@ export const Player = ({
     playerLocation(player),
     locationBuffer,
   );
-if (!character) {
+  if (!character) {
     if (!logged.has(playerCharacter)) {
       logged.add(playerCharacter);
       toast.error(`Unknown character ${playerCharacter}`);

@@ -25,7 +25,9 @@ export default function PlayerDetails({
   setSelectedElement: SelectElement;
   scrollViewRef: React.RefObject<HTMLDivElement>;
 }) {
-  const humanTokenIdentifier = useQuery(api.world.userStatus, { worldId });
+  const oauth = JSON.parse(localStorage.getItem('oauth'));
+  const oauthToken = oauth ? oauth.userInfo.fullname : undefined;
+  const humanTokenIdentifier = useQuery(api.world.userStatus, { worldId, oauthToken });  
 
   const players = [...game.world.players.values()];
   const humanPlayer = players.find((p) => p.human === humanTokenIdentifier);

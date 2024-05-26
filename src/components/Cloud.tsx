@@ -9,7 +9,7 @@ export const Cloud = ({
   worldId: Id<"worlds">
 }) => {
   return (
-    <img src="/ai-town/assets/cloud.jpg" className="absolute  w-full h-full object-cover" />
+    <img src="/assets/cloud.jpg" className="absolute  w-full h-full object-cover" />
   )
 }
 

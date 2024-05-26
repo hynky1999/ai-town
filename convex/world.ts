@@ -98,30 +98,38 @@ export const restartDeadWorlds = internalMutation({
 export const userStatus = query({
   args: {
     worldId: v.id('worlds'),
+    oauthToken: v.optional(v.string()),
+
   },
   handler: async (ctx, args) => {
-    // const identity = await ctx.auth.getUserIdentity();
-    // if (!identity) {
-    //   return null;
-    // }
-    // return identity.tokenIdentifier;
-    return DEFAULT_NAME;
+    const { worldId, oauthToken } = args;
+    
+    if (!oauthToken) {
+     return null;
+    }
+    console.log("oauthToken",oauthToken)
+    return oauthToken;
   },
 });
 
 export const joinWorld = mutation({
   args: {
     worldId: v.id('worlds'),
+    oauthToken: v.optional(v.string()),
+
   },
   handler: async (ctx, args) => {
-    // const identity = await ctx.auth.getUserIdentity();
+    const { worldId, oauthToken } = args;
+    
+    if (!oauthToken) {
+      throw new ConvexError(`Not logged in`);
+    }
     // if (!identity) {
     //   throw new ConvexError(`Not logged in`);
     // }
     // const name =
     //   identity.givenName || identity.nickname || (identity.email && identity.email.split('@')[0]);
-    // const name = DEFAULT_NAME;
-    
+    const name = oauthToken;
     // if (!name) {
     //   throw new ConvexError(`Missing name on ${JSON.stringify(identity)}`);
     // }
@@ -154,7 +162,7 @@ export const joinWorld = mutation({
       character: randomCharacter.character,
       description: randomCharacter.identity,
       // description: `${identity.givenName} is a human player`,
-      tokenIdentifier: DEFAULT_NAME, // TODO: change for multiplayer to oauth
+      tokenIdentifier: oauthToken, // TODO: change for multiplayer to oauth
       // By default everybody is a villager
       type: 'villager',
     });
@@ -164,19 +172,21 @@ export const joinWorld = mutation({
 export const leaveWorld = mutation({
   args: {
     worldId: v.id('worlds'),
+    oauthToken: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // const identity = await ctx.auth.getUserIdentity();
-    // if (!identity) {
-    //   throw new Error(`Not logged in`);
-    // }
-    // const { tokenIdentifier } = identity;
+    const { worldId, oauthToken } = args;
+    
+    if (!oauthToken) {
+      throw new ConvexError(`Not logged in`);
+    }
+
     const world = await ctx.db.get(args.worldId);
     if (!world) {
       throw new Error(`Invalid world ID: ${args.worldId}`);
     }
     // const existingPlayer = world.players.find((p) => p.human === tokenIdentifier);
-    const existingPlayer = world.players.find((p) => p.human === DEFAULT_NAME);
+    const existingPlayer = world.players.find((p) => p.human === oauthToken);
     if (!existingPlayer) {
       return;
     }

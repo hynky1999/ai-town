@@ -128,21 +128,21 @@ export const agentDoSomething = internalAction({
         return;
       } else {
         // TODO: have LLM choose the activity & emoji
-        // const activity = ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)];
-        // await sleep(Math.random() * 1000);
-        // await ctx.runMutation(api.aiTown.main.sendInput, {
-        //   worldId: args.worldId,
-        //   name: 'finishDoSomething',
-        //   args: {
-        //     operationId: args.operationId,
-        //     agentId: agent.id,
-        //     activity: {
-        //       description: activity.description,
-        //       emoji: activity.emoji,
-        //       until: Date.now() + activity.duration,
-        //     },
-        //   },
-        // });
+        const activity = ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)];
+        await sleep(Math.random() * 1000);
+        await ctx.runMutation(api.aiTown.main.sendInput, {
+          worldId: args.worldId,
+          name: 'finishDoSomething',
+          args: {
+            operationId: args.operationId,
+            agentId: agent.id,
+            activity: {
+              description: activity.description,
+              emoji: activity.emoji,
+              until: Date.now() + activity.duration,
+            },
+          },
+        });
         return;
       }
     }
