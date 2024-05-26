@@ -63,7 +63,7 @@ async function getOrCreateDefaultWorld(ctx: MutationCtx) {
     // initialize game cycle counter
     gameCycle: {
       currentTime: 0,
-      cycleState: 'Day',
+      cycleState: 'LobbyState',
       cycleIndex: 0,
     },
     gameVotes: [],

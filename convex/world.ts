@@ -12,6 +12,8 @@ import {
 import { playerId } from './aiTown/ids';
 import { kickEngine, startEngine, stopEngine } from './aiTown/main';
 import { engineInsertInput } from './engine/abstractGame';
+import { useServerGame } from '../src/hooks/serverGame';
+import { Game } from './aiTown/game';
 
 export const defaultWorldStatus = query({
   handler: async (ctx) => {
@@ -183,6 +185,29 @@ export const leaveWorld = mutation({
     await insertInput(ctx, world._id, 'leave', {
       playerId: existingPlayer.id,
     });
+  },
+});
+
+export const startGame = mutation({
+  args: {
+    worldId: v.id('worlds'),
+  },
+  handler: async (ctx, args) => {
+    // const identity = await ctx.auth.getUserIdentity();
+    // if (!identity) {
+    //   throw new Error(`Not logged in`);
+    // }
+    // const { tokenIdentifier } = identity;
+    // const world = await ctx.db.get(args.worldId);
+    // if (!world) {
+    //   throw new Error(`Invalid world ID: ${args.worldId}`);
+    // }
+    const game = useServerGame(args.worldId) as Game
+    if (game) {
+      await game.assignRoles()
+      console.log('assigned roles')
+      await game.world.gameCycle.startNormal()
+    }
   },
 });
 

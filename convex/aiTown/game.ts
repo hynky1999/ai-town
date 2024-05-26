@@ -229,8 +229,9 @@ export class Game extends AbstractGame {
       // Check for end game conditions
       // are there any humans?
       // we check for endgame if there's at least 1 human player
-      const humans = [...this.world.players.values()].filter(player => player.human)
-      if (humans.length > 0) {
+      // const humans = [...this.world.players.values()].filter(player => player.human)
+      // if (humans.length > 0) {
+      if (this.world.gameCycle.cycleState != 'LobbyState') {
         // all 'werewolf' are dead -> villagers win
         const werewolves = [...this.world.players.values()].filter(player => 
           player.playerType(this) === 'werewolf'

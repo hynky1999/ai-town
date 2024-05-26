@@ -105,6 +105,13 @@ export class GameCycle {
     this.cycleIndex = cycleIndex;
   }
 
+  startNormal() {
+    this.currentTime = 0;
+    this.cycleState = 'Day';
+    this.cycleIndex = 0;
+    console.log('EndGame reached')
+  }
+
   endgame() {
     this.currentTime = 0;
     this.cycleState = 'EndGame';
