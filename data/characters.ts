@@ -217,7 +217,7 @@ export const characters = [
   },
   {
     name: 'c1',
-    textureUrl: '/ai-town/assets/GrayCat.png',
+    textureUrl: '/ai-town/assets/GrayCat.webp',
     spritesheetData: c1SpritesheetData,
     speed: 0.19,
   },

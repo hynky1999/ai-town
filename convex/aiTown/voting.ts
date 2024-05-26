@@ -90,6 +90,7 @@ export function parseLLMVotingResult(voter: Player, log: any | null, game: Game)
 export async function LLmvotingCallWerewolf(werewolf: Player, villagers: PlayerDescription[]) {
   // TODO: Use messages
   // TODO: till fixed
+  return null
   const inference = new HfInference();
   const params = {
     model: "tgi",
@@ -129,6 +130,7 @@ export async function LLmvotingCallWerewolf(werewolf: Player, villagers: PlayerD
 }
 export async function LLmvotingCallAll(villagers: PlayerDescription[]) {
   // TODO: till fixed
+  return null
   const inference = new HfInference();
   const params = {
     model: "tgi",

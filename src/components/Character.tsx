@@ -50,7 +50,7 @@ export const Character = ({
       setSpriteSheet(sheet);
     };
     void parseSheet();
-  }, []);
+  }, [textureUrl]);
 
   // The first "left" is "right" but reflected.
   const roundedOrientation = Math.floor(orientation / 90);
