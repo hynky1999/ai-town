@@ -10,6 +10,7 @@ import {
 import { LLMMessage, chatCompletion } from '../util/llm';
 import { processVotes } from './voting';
 import { HfInference } from "@huggingface/inference";
+import { PlayerDescription } from './playerDescription';
 
 export type CycleState = 'Day' | 'Night' | 'WerewolfVoting' | 'PlayerKillVoting' | 'EndGame' | 'LobbyState'
 
@@ -81,7 +82,7 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
   const handleAsyncCalls = async () => {
     // Call the async function for each werewolf
     for (const villager of villagers) {
-       const result =  await LLmvotingCallAll( villagers);
+       const result =  await LLmvotingCallAll(villagers);
        processFc(result,game)
     }
   };
@@ -95,6 +96,29 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
       player.playerType(game) === 'werewolf'
     )
     if (werewolves.length > 0) {
+      // input votes from werewolf LLM
+      const villagerDescription = [...game.playerDescriptions.values()].filter(player => 
+        player.type === 'villager'
+      );
+      Promise.all(werewolves.map(wwolf => {
+        if (!wwolf.human) {
+          const wwolfDescription = game.playerDescriptions.get(wwolf.id);
+          if (wwolfDescription) {
+            return LLmvotingCallWerewolf(wwolfDescription, villagerDescription);
+
+          }
+        }
+      })).then(results => {
+        results.map(result => {
+          if (result.arguments && result.arguments.playerId) {
+            console.log(result);
+            console.log('Successfully voted to eliminate villager: ', result.arguments.playerId);
+          }
+        })
+      }
+      )
+
+
       const mostVotedPlayer = processVotes(game.world.gameVotes, [...game.world.players.values()])[0];
       const playerToKill = game.world.players.get(mostVotedPlayer.playerId);
       console.log(`killing: ${playerToKill?.id}, with ${game.world.gameVotes.length} votes`)
@@ -116,27 +140,27 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
     game.world.gameVotes = [];
   }
 };
-function processFc(log, game) {
+function processFc(log: any, game: Game) {
   try {
-    if (log.arguments && log.arguments.character) {
-      console.log('Voted to eliminate villager: ', log.arguments.character);
+    if (log.arguments && log.arguments.playerId) {
+      console.log('Successfully voted to eliminate villager: ', log.arguments.playerId);
     } else {
       const players = game.playerDescriptions.values();
-      const characters = [...players].map(player => player.character); 
-      const randomCharacter = characters[Math.floor(Math.random() * characters.length)];
+      const playerIds = [...players].map(player => player.playerId); 
+      const randomCharacter = playerIds[Math.floor(Math.random() * playerIds.length)];
       console.log('Voted to eliminate villager: ', randomCharacter);
     }
   } catch (error) {
     const players = game.playerDescriptions.values();
-    const characters = [...players].map(player => player.character); 
-    const randomCharacter = characters[Math.floor(Math.random() * characters.length)]; 
+      const playerIds = [...players].map(player => player.playerId); 
+      const randomCharacter = playerIds[Math.floor(Math.random() * playerIds.length)];
     console.log('Voted to eliminate villager: ', randomCharacter);
   }
 }
 
 
-export async function LLmvotingCallWerewolf(werewolf,villagers) {
-  const inference = new HfInference("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");
+export async function LLmvotingCallWerewolf(werewolf: PlayerDescription, villagers: PlayerDescription[]) {
+  const inference = new HfInference("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");
   const params = {
     model: "tgi",
     messages: [
@@ -154,14 +178,14 @@ export async function LLmvotingCallWerewolf(werewolf,villagers) {
         type: "function",
         function: {
           name: "vote_player",
-          description: "A function to chose on who to kicked out",
+          description: "A function to chose on who to kick out",
           parameters: {
             type: "object",
             properties: {
-              character: { type: "string", description: "The character name of the player to eliminate. ( eg : f1, f2, f3 etc ...)" },
+              playerId: { type: "string", description: "The character playerId of the player to eliminate. ( eg : p:1, p:2, p:3 etc ...)" },
 
             },
-            required: ["character"],
+            required: ["playerId"],
           },
         },
       },
@@ -178,8 +202,8 @@ console.log(response.choices[0].message.tool_calls[0].function)
 return response.choices[0].message.tool_calls[0].function
   
 }
-export async function LLmvotingCallAll(villagers) {
-  const inference = new HfInference("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");
+export async function LLmvotingCallAll(villagers: PlayerDescription[]) {
+  const inference = new HfInference("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");
   const params = {
     model: "tgi",
     messages: [
@@ -197,14 +221,14 @@ export async function LLmvotingCallAll(villagers) {
         type: "function",
         function: {
           name: "vote_player",
-          description: "A function to chose on who to kicked out",
+          description: "A function to chose on who to kick out",
           parameters: {
             type: "object",
             properties: {
-              character: { type: "string", description: "The character name of the player to eliminate. ( eg : f1, f2, f3 etc ...)" },
+              playerId: { type: "string", description: "The character playerId of the player to eliminate. ( eg : p:1, p:2, p:3 etc ...)" },
 
             },
-            required: ["character"],
+            required: ["playerId"],
           },
         },
       },
