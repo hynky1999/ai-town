@@ -85,10 +85,10 @@ export const Character = ({
 
   return (
     <Container x={x} y={y} interactive={true} pointerdown={onClick} cursor="pointer">
-      {isThinking && (
+      {/* {isThinking && (
         // TODO: We'll eventually have separate assets for thinking and speech animations.
         <Text x={-20} y={-10} scale={{ x: -0.8, y: 0.8 }} text={'💭'} anchor={{ x: 0.5, y: 0.5 }} />
-      )}
+      )} */}
       {isSpeaking && (
         // TODO: We'll eventually have separate assets for thinking and speech animations.
         <Text x={18} y={-10} scale={0.8} text={'💬'} anchor={{ x: 0.5, y: 0.5 }} />

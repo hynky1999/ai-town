@@ -115,11 +115,18 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
     })
   };
   if (prevState === 'PlayerKillVoting') {
-    const mostVotedPlayer = processVotes(game.world.gameVotes, [...game.world.players.values()])[0];
-    const playerToKill = game.world.players.get(mostVotedPlayer.playerId);
-    console.log(`killing: ${playerToKill?.id}, with ${game.world.gameVotes.length} votes`)
-    if (playerToKill) {
-      playerToKill.kill(game, now);
+    const werewolves = [...game.world.players.values()].filter((were) => {
+      game.playerDescriptions.get(were.id)?.type === 'werewolf'
+    })
+    if (werewolves.length != 0) {
+      const mostVotedPlayer = processVotes(game.world.gameVotes, [...game.world.players.values()])[0];
+      const playerToKill = game.world.players.get(mostVotedPlayer.playerId);
+      console.log(`killing: ${playerToKill?.id}, with ${game.world.gameVotes.length} votes`)
+      if (playerToKill) {
+        playerToKill.kill(game, now);
+      }
+    } else {
+      console.log('no werewolves, nobody was killed')
     }
     game.world.gameVotes = [];
   }
