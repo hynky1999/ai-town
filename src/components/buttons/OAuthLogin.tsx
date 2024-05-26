@@ -42,17 +42,15 @@ const OAuthLogin = () => {
   };
 
   return (
-    <div>
+    <>
       {isSignedIn ? (
-        <div>
           <Button id="signout" imgUrl={hf} onClick={handleSignOut}>Sign out</Button>
-        </div>
       ) : (
         <Button id="signin" imgUrl={hf} onClick={handleSignIn}>
           Sign in with Hugging Face
         </Button>
       )}
-    </div>
+      </>
   );
 };
 

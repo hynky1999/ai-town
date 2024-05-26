@@ -14,7 +14,7 @@ export default function Button(props: {
   return (
     <a
       className={clsx(
-        'button text-white shadow-solid text-xl pointer-events-auto',
+        'button text-white bg-clay-700 rounded shadow-solid text-xl pointer-events-auto',
         props.className,
         props.selected && 'button-selected',
         props.disabled && 'disabled',
