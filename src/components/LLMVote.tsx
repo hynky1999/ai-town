@@ -26,7 +26,9 @@ export default function LLMVote(
 ) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [votes, setVotes] = useState<GameId<'players'>[]>([]);
-  const players = [...game.world.playersInit.values()]
+  const players = [...game.world.playersInit.values()].filter(
+    (player) => player.id !== playerId
+  )
   const inputVote = useSendInput(engineId, "llmVote");
   const totalLLMs = players.filter((player) => !player.human).length
   return (
