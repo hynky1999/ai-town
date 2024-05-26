@@ -253,6 +253,11 @@ export class Game extends AbstractGame {
           this.world.winner = 'werewolves'
         }
       }
+
+      // Quit LobbyState to start the game once we have at least 3 players
+      if (this.world.gameCycle.cycleState === 'LobbyState' && humans.length >= 1) {
+        this.world.gameCycle.startGame(this)
+      }
   
       // debug
       // console.log(`we have ${ villagers.length } villagers`)

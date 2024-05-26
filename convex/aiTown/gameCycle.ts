@@ -151,6 +151,10 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
     pushToGist(averageCorrectVotes);
 
   }
+
+  if (prevState == 'LobbyState') {
+    game.assignRoles()
+  }
 };
 
 export class GameCycle {
@@ -163,6 +167,14 @@ export class GameCycle {
     this.currentTime = currentTime;
     this.cycleState = cycleState;
     this.cycleIndex = cycleIndex;
+  }
+
+  startGame(game: Game) {
+    this.currentTime = 0;
+    onStateChange(this.cycleState, 'Day', game, 0);
+    this.cycleState = 'Day';
+    this.cycleIndex = 0;
+    console.log('Game started')
   }
 
   endgame(game: Game) {
