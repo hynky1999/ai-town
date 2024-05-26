@@ -8,7 +8,7 @@ export function EndGame({
   game: ServerGame
   playerId: GameId<'players'>
 }) {
-    const llms = [...game.world.players.values()].filter(player => player.human);
+    const llms = [...game.world.playersInit.values()].filter(player => !player.human);
     const playerVotes = [...game.world.llmVotes].filter((vote) => vote.voter === playerId);
     if (playerVotes.length === 0) {
         return <p>You didn't vote</p>

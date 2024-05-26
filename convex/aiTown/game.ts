@@ -238,7 +238,7 @@ export class Game extends AbstractGame {
         if (werewolves.length === 0) {
           // TODO finish game with villagers victory
           // console.log('villagers win')
-          this.world.gameCycle.endgame()
+          this.world.gameCycle.endgame(this)
           this.world.winner = 'villagers'
         }
     
@@ -249,7 +249,7 @@ export class Game extends AbstractGame {
         if (villagers.length <= 1) {
           // TODO finish game with werewolves victory
           // console.log('werewolves win')
-          this.world.gameCycle.endgame()
+          this.world.gameCycle.endgame(this)
           this.world.winner = 'werewolves'
         }
       }

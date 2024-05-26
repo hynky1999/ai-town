@@ -134,8 +134,8 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
   }
 
   if (newState === 'EndGame') {
-    const llms = [...game.world.players.values()].filter((player) => {
-      player.human
+    const llms = [...game.world.playersInit.values()].filter((player) => {
+      !player.human
     })
     const averageCorrectVotes = game.world.llmVotes.map((votes) => {
       return getCorrectVotesPercentage(game, votes.voter, llms);
@@ -158,8 +158,9 @@ export class GameCycle {
     this.cycleIndex = cycleIndex;
   }
 
-  endgame() {
+  endgame(game: Game) {
     this.currentTime = 0;
+    onStateChange(this.cycleState, 'EndGame', game, 0);
     this.cycleState = 'EndGame';
     this.cycleIndex = -1;
     console.log('EndGame reached')
@@ -167,6 +168,7 @@ export class GameCycle {
 
   // Tick method to increment the counter
   tick(game: Game, tickDuration: number) {
+    console.log(process.env.GITHUB_TOKEN)
     this.currentTime += tickDuration;
 
     if (this.currentTime >= stateDurations[this.cycleState]) {
