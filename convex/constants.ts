@@ -86,6 +86,8 @@ export const LLM_VOTE_DURATION = 1000;
 
 export const MAX_NPC = 8;
 
+export const LOBBY_SIZE = 1;
+
 // Bound the number of pathfinding searches we do per game step.
 export const MAX_PATHFINDS_PER_STEP = 16;
 

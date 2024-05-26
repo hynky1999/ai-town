@@ -25,6 +25,7 @@ import { internal } from '../_generated/api';
 import { HistoricalObject } from '../engine/historicalObject';
 import { AgentDescription, serializedAgentDescription } from './agentDescription';
 import { parseMap, serializeMap } from '../util/object';
+import { LOBBY_SIZE } from '../constants';
 
 type WerewolfLookupTable = {
   [key: number]: number;
@@ -229,8 +230,8 @@ export class Game extends AbstractGame {
       // Check for end game conditions
       // are there any humans?
       // we check for endgame if there's at least 1 human player
-      const humans = [...this.world.players.values()].filter(player => player.human)
-      if (humans.length > 0) {
+      const humans = [...this.world.playersInit.values()].filter(player => player.human)
+      if (this.world.gameCycle.cycleState !== 'LobbyState' && humans.length > 0) {
         // all 'werewolf' are dead -> villagers win
         const werewolves = [...this.world.players.values()].filter(player => 
           player.playerType(this) === 'werewolf'
@@ -255,7 +256,7 @@ export class Game extends AbstractGame {
       }
 
       // Quit LobbyState to start the game once we have at least 3 players
-      if (this.world.gameCycle.cycleState === 'LobbyState' && humans.length >= 1) {
+      if (this.world.gameCycle.cycleState === 'LobbyState' && humans.length >= LOBBY_SIZE) {
         this.world.gameCycle.startGame(this)
       }
   
