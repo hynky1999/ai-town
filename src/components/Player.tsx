@@ -35,7 +35,7 @@ export const Player = ({
   }
   let character = characters.find((c) => c.name === playerCharacter);
   // If it's night, use the night version of the character
-  if (game.world.gameCycle.cycleState === 'Night') {
+  if (game.world.gameCycle.cycleState === 'Night' && game.playerDescriptions.get(player.id)?.type === 'werewolf') {
     character = characters.find((c) => c.name === 'c1');
   }
   const locationBuffer = game.world.historicalLocations?.get(player.id);
