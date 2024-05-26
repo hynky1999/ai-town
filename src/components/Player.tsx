@@ -10,12 +10,10 @@ import { useHistoricalValue } from '../hooks/useHistoricalValue.ts';
 import { PlayerDescription } from '../../convex/aiTown/playerDescription.ts';
 import { WorldMap } from '../../convex/aiTown/worldMap.ts';
 import { ServerGame } from '../hooks/serverGame.ts';
-import { useEffect,useState } from 'react';
 
 export type SelectElement = (element?: { kind: 'player'; id: GameId<'players'> }) => void;
 
 const logged = new Set<string>();
-
 
 export const Player = ({
   game,
@@ -32,30 +30,14 @@ export const Player = ({
   historicalTime?: number;
 }) => {
   const playerCharacter = game.playerDescriptions.get(player.id)?.character;
-  console.log(playerCharacter)
-  if (!playerCharacter) {
+    if (!playerCharacter) {
     throw new Error(`Player ${player.id} has no character`);
   }
- let initcharacter = characters.find((c) => c.name === playerCharacter);
-
-  const [currentSprite, setCurrentSprite] = useState({
-    sprite: playerCharacter
-  });
-  const [currentcaracter, setCurrentcaracter] = useState({initcharacter});
-  const  [previousSprite, setpreviousSprite] = useState({
-    sprite: playerCharacter
-  });
-   // Effect hook to change the tileSet based on a day/night condition
-   useEffect(() => {
-    const { cycleState } = game.world.gameCycle;
-    const tileSet = (cycleState === 'Day' || cycleState === 'Night') ? previousSprite : { sprite: "c1" };
-    setCurrentSprite(tileSet);
-   
-    let character = characters.find((c) => c.name === currentSprite.sprite);
-    setCurrentcaracter(character)
-  }, [game.world.gameCycle.cycleState, previousSprite]);
-  let character = characters.find((c) => c.name === currentSprite.sprite);
-  
+  let character = characters.find((c) => c.name === playerCharacter);
+  // If it's night, use the night version of the character
+  if (game.world.gameCycle.cycleState === 'Night') {
+    character = characters.find((c) => c.name === 'c1');
+  }
   const locationBuffer = game.world.historicalLocations?.get(player.id);
   const historicalLocation = useHistoricalValue<Location>(
     locationFields,
@@ -63,7 +45,7 @@ export const Player = ({
     playerLocation(player),
     locationBuffer,
   );
-  if (!currentSprite?.sprite) {
+if (!character) {
     if (!logged.has(playerCharacter)) {
       logged.add(playerCharacter);
       toast.error(`Unknown character ${playerCharacter}`);
@@ -100,9 +82,9 @@ export const Player = ({
             : undefined
         }
         isViewer={isViewer}
-        textureUrl={currentcaracter?.textureUrl}
-        spritesheetData={currentcaracter?.sheetData}
-        speed={currentcaracter?.speed}
+        textureUrl={character.textureUrl}
+        spritesheetData={character.spritesheetData}
+        speed={character.speed}
         onClick={() => {
           onClick({ kind: 'player', id: player.id });
         }}
