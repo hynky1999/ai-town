@@ -44,7 +44,6 @@ export const VoteModal = ({
   onVote: (votes: GameId<'players'>[]) => void,
   compact: boolean
 }) => {
-  const inputVote = useSendInput(engineId, "gameVote");
   const vote = (playerId: GameId<'players'>) => {
     let newVotes = votes;
     if (votes.includes(playerId)) {
@@ -58,7 +57,6 @@ export const VoteModal = ({
     }
     console.log(`votes: ${newVotes.map((vote) => game.playerDescriptions.get(vote)?.name).join(", ")}`)
     onVote(newVotes);
-    inputVote({voter: playerId, votedPlayerIds: newVotes});
   }
   const [spriteSheet, setSpriteSheet] = useState<Spritesheet>();
   const character = characters[0]

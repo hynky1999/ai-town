@@ -16,10 +16,10 @@ import { VoteModal } from './VoteModal.tsx';
 import { GameCycle } from '../../convex/aiTown/gameCycle.ts';
 import { PlayerDescription } from '../../convex/aiTown/playerDescription.ts';
 import { Cloud } from './Cloud.tsx';
-import { World } from '../../convex/aiTown/world.ts';
-import VotingPopover from './VotingPopover.tsx';
-import { FooterPortal } from './FooterContext.tsx';
+import VotingPopover from './LLMVote.tsx';
 import { createPortal } from 'react-dom';
+import { useSendInput } from "../hooks/sendInput";
+import GameVote from './GameVote.tsx';
 
 export const SHOW_DEBUG_UI = !!import.meta.env.VITE_SHOW_DEBUG_UI;
 
@@ -136,8 +136,7 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
             <h2 className="text-2xl font-bold">{GameStateLabel(game as GameObj, meDescription).label}</h2>
             <p className="text-lg text-center">{GameStateLabel(game as GameObj, meDescription).desc}</p>
           </div>
-          {playerId && canVote(game, meDescription) ?  <VoteModal compact={false} game={game} engineId={engineId} playerId={playerId} maxVotes={1} votes={votes} onVote={setVotes} /> :
-          <PlayerDetails
+          {playerId && canVote(game, meDescription) ? <GameVote engineId={engineId} game={game} playerId={playerId} /> : <PlayerDetails
             worldId={worldId}
             engineId={engineId}
             game={game}

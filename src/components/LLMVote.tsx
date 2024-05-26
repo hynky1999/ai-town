@@ -11,8 +11,9 @@ import { Id } from "../../convex/_generated/dataModel"
 import { ServerGame } from "@/hooks/serverGame"
 import { useState } from "react"
 import { VoteModal } from "./VoteModal";
+import { useSendInput } from "../hooks/sendInput";
 
-export default function Component(
+export default function LLMVote(
   {
     game,
     engineId,
@@ -25,7 +26,7 @@ export default function Component(
 ) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [votes, setVotes] = useState<GameId<'players'>[]>([]);
-  const llms = [...game.world.players.values()].filter(p => p.human)
+  const inputVote = useSendInput(engineId, "llmVote");
 
   const maxVotes = 10
   return (
@@ -37,6 +38,7 @@ export default function Component(
         isOpen={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
         contentLabel="Choose LLM"
+        ariaHideApp={false}
         className="mx-auto bg-brown-800 p-16 game-frame font-body max-w-[1000px]"
         style={{
           content: {
@@ -49,7 +51,10 @@ export default function Component(
       >
         <h2 className="text-2xl font-bold text-center mb-8">Which players are LLMs ? (Choose up to {maxVotes} players)</h2>
         <div className="max-w-[600px] w-full mx-auto">
-          <VoteModal compact={false} votes={votes} onVote={setVotes} engineId={engineId} game={game} playerId={playerId} maxVotes={10} />
+          <VoteModal compact={false} votes={votes} onVote={(newVotes) => {
+            setVotes(newVotes)
+            inputVote({voter: playerId, votedPlayerIds: newVotes});
+          }} engineId={engineId} game={game} playerId={playerId} maxVotes={10} />
         </div>
       </Modal>
     </>
