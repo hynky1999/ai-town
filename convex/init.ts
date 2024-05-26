@@ -6,7 +6,7 @@ import * as map from '../data/gentle';
 import { insertInput } from './aiTown/insertInput';
 import { Id } from './_generated/dataModel';
 import { createEngine } from './aiTown/main';
-import { ENGINE_ACTION_DURATION } from './constants';
+import { ENGINE_ACTION_DURATION, MAX_NPC } from './constants';
 import { assertApiKey } from './util/llm';
 
 const init = mutation({
@@ -28,7 +28,7 @@ const init = mutation({
       worldStatus.engineId,
     );
     if (shouldCreate) {
-      const toCreate = args.numAgents !== undefined ? args.numAgents : Descriptions.length;
+      const toCreate = args.numAgents !== undefined ? args.numAgents : MAX_NPC; //Descriptions.length;
       for (let i = 0; i < toCreate; i++) {
         await insertInput(ctx, worldStatus.worldId, 'createAgent', {
           descriptionIndex: i % Descriptions.length,

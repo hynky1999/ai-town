@@ -2,6 +2,7 @@ import { ConvexError, v } from 'convex/values';
 import { internalMutation, mutation, query } from './_generated/server';
 import { characters } from '../data/characters';
 import { insertInput } from './aiTown/insertInput';
+import { Descriptions } from '../data/characters';
 import {
   DEFAULT_NAME,
   ENGINE_ACTION_DURATION,
@@ -119,8 +120,8 @@ export const joinWorld = mutation({
     // }
     // const name =
     //   identity.givenName || identity.nickname || (identity.email && identity.email.split('@')[0]);
-    const name = DEFAULT_NAME;
-
+    // const name = DEFAULT_NAME;
+    
     // if (!name) {
     //   throw new ConvexError(`Missing name on ${JSON.stringify(identity)}`);
     // }
@@ -128,13 +129,32 @@ export const joinWorld = mutation({
     if (!world) {
       throw new ConvexError(`Invalid world ID: ${args.worldId}`);
     }
+
+    const playerIds = [...world.playersInit.values()].map(player => player.id)
+
+    const playerDescriptions = await ctx.db
+      .query('playerDescriptions')
+      .withIndex('worldId', (q) => q.eq('worldId', args.worldId))
+      .collect();
+
+    const namesInGame = playerDescriptions.map(description => {
+      if (playerIds.includes(description.playerId)) {
+        return description.name
+      }
+    })
+    const availableDescriptions = Descriptions.filter(
+      description => !namesInGame.includes(description.name)
+    );
+
+    const randomCharacter = availableDescriptions[Math.floor(Math.random() * availableDescriptions.length)];
+
     // const { tokenIdentifier } = identity;
     return await insertInput(ctx, world._id, 'join', {
-      name,
-      character: characters[Math.floor(Math.random() * characters.length)].name,
-      description: `${DEFAULT_NAME} is a human player`,
+      name: randomCharacter.name,
+      character: randomCharacter.character,
+      description: randomCharacter.identity,
       // description: `${identity.givenName} is a human player`,
-      tokenIdentifier: DEFAULT_NAME,
+      tokenIdentifier: DEFAULT_NAME, // TODO: change for multiplayer to oauth
       // By default everybody is a villager
       type: 'villager',
     });
