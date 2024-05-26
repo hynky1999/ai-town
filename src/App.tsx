@@ -66,17 +66,10 @@ export default function Home() {
     </p>
 </div>
       </ReactModal>
-      {/*<div className="p-3 absolute top-0 right-0 z-10 text-2xl">
-        <Authenticated>
-          <UserButton afterSignOutUrl="/ai-town" />
-        </Authenticated>
 
-        <Unauthenticated>
-          <LoginButton />
-        </Unauthenticated>
-      </div> */}
 
-<div className="w-full lg:h-screen min-h-screen relative isolate overflow-hidden shadow-2xl flex flex-col justify-start">
+      <div className="w-full lg:h-screen min-h-screen relative isolate overflow-hidden lg:p-8 shadow-2xl flex flex-col justify-start">
+
         <Game />
 
         <footer className="justify-end bottom-0 left-0 w-full flex items-center mt-4 gap-3 p-6 flex-wrap pointer-events-none">

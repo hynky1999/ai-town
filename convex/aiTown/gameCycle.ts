@@ -175,7 +175,6 @@ export class GameCycle {
 
   // Tick method to increment the counter
   tick(game: Game, tickDuration: number) {
-    console.log(process.env.GITHUB_TOKEN)
     this.currentTime += tickDuration;
 
     if (this.currentTime >= stateDurations[this.cycleState]) {

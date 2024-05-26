@@ -282,6 +282,7 @@ export class Player {
     if (agent) {
       agent.kill(game, now)
     }
+    
   }
 
   serialize(): SerializedPlayer {
