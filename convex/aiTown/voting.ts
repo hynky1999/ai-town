@@ -2,6 +2,8 @@ import { ObjectType, v } from "convex/values";
 import { GameId, parseGameId, playerId } from "./ids";
 import { Player } from "./player";
 import { Game } from "./game";
+import { HfInference } from "@huggingface/inference";
+import { PlayerDescription } from "./playerDescription";
 
 export const VotesSchema = {
   voter: playerId,
@@ -71,5 +73,96 @@ export const processVotes = (votes: Votes[], players: Player[], k: number = 1) =
     };
   });
   return topKPlayers;
+}
+export function parseLLMVotingResult(voter: Player, log: any | null, game: Game) {
+  let votedPlayerId = ''
+  if (log?.arguments?.playerId) {
+    console.log('Successfully voted to eliminate villager: ', log.arguments.playerId);
+    votedPlayerId = log.arguments.playerId as string
+  } else {
+    const players = game.playerDescriptions.values();
+    const playerIds = [...players].map(player => player.playerId);
+    votedPlayerId = playerIds[Math.floor(Math.random() * playerIds.length)];
+    console.log('Voted to eliminate villager: ', votedPlayerId);
+  }
+  gameVote(game, voter.id, [votedPlayerId as GameId<'players'>]);
+}
+export async function LLmvotingCallWerewolf(werewolf: Player, villagers: PlayerDescription[]) {
+  // TODO: Use messages
+  const inference = new HfInference();
+  const params = {
+    model: "tgi",
+    messages: [
+      {
+        role: "system",
+        content: "You are a werewolf and shall eliminate someone based on a conversation. You shall eliminate villagers. Don't make assumptions about what values to plug into functions. You MUST call a tool",
+      },
+      { role: "user", content: `Who do you want to eliminate between the following player ? \n players : ${villagers} \n ` },
+    ],
+    max_tokens: 500,
+    tool_choice: "auto",
+    tools: [
+      {
+        type: "function",
+        function: {
+          name: "vote_player",
+          description: "A function to chose on who to kick out",
+          parameters: {
+            type: "object",
+            properties: {
+              playerId: { type: "string", description: "The character playerId of the player to eliminate. ( eg : p:1, p:2, p:3 etc ...)" },
+            },
+            required: ["playerId"],
+          },
+        },
+      },
+    ],
+  };
+  // Streaming chat completion API
+  const llama3 = inference.endpoint(
+    "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions"
+  );
+
+  const response = await llama3.chatCompletion(params);
+  return response?.choices[0]?.message?.tool_calls?.[0]?.function || null;
+}
+export async function LLmvotingCallAll(villagers: PlayerDescription[]) {
+  const inference = new HfInference("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");
+  const params = {
+    model: "tgi",
+    messages: [
+      {
+        role: "system",
+        content: "You are a villager and shall try to eliminate someone based on a conversation. You shall eliminate werewolves. Don't make assumptions about what values to plug into functions. You MUST call a tool",
+      },
+      { role: "user", content: `Who do you want to eliminate between the following player ? \n players : ${villagers} \n ` },
+    ],
+    max_tokens: 500,
+    tool_choice: "auto",
+    tools: [
+      {
+        type: "function",
+        function: {
+          name: "vote_player",
+          description: "A function to chose on who to kick out",
+          parameters: {
+            type: "object",
+            properties: {
+              playerId: { type: "string", description: "The character playerId of the player to eliminate. ( eg : p:1, p:2, p:3 etc ...)" },
+            },
+            required: ["playerId"],
+          },
+        },
+      },
+    ],
+  };
+  // Streaming chat completion API
+  const llama3 = inference.endpoint(
+    "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions"
+  );
+
+  const response = await llama3.chatCompletion(params);
+  return response?.choices[0]?.message?.tool_calls?.[0]?.function || null;
+
 }
 
