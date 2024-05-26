@@ -1,52 +1,30 @@
-# syntax = docker/dockerfile:1
-
-# Adjust NODE_VERSION as desired
-ARG NODE_VERSION=19.8.1
-FROM node:${NODE_VERSION}-slim as base
-
-LABEL fly_launch_runtime="Next.js"
-
-# Next.js app lives here
+FROM ubuntu:22.04 as base
 WORKDIR /app
-
-# Set production environment
 ENV NODE_ENV=production
 
-
-# Throw-away build stage to reduce size of final image
 FROM base as build
 
-# Install packages needed to build node modules
 RUN apt-get update -qq && \
-    apt-get install -y python-is-python3 pkg-config build-essential 
+    apt-get install -y git curl unzip wget gnupg build-essential lsb-release
 
-# Install node modules
-COPY --link package-lock.json package.json ./
-RUN npm ci --include=dev
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y nodejs
 
-# Copy application code
-COPY --link . .
+RUN useradd -m -u 1000 user
+RUN chown -R user:user /app /usr/local /tmp
+USER user
+ENV HOME=/home/user \
+    PATH=/home/user/.local/bin:$PATH
 
-ARG NEXT_PUBLIC_CLERK_SIGN_IN_URL
-ARG NEXT_PUBLIC_CLERK_SIGN_UP_URL
-ARG NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL
-ARG NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL
-ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
-ARG NEXT_PUBLIC_CONVEX_URL
-
-# Build application
-RUN npm run build
-
-# Remove development dependencies
-RUN npm prune --omit=dev
+WORKDIR $HOME/app
+RUN npm install --include=dev @huggingface/inference
+RUN npm install --include=dev @huggingface/hub
 
 
-# Final stage for app image
-FROM base
+RUN curl -L -O https://github.com/get-convex/convex-backend/releases/download/precompiled-2024-05-07-13337fd/convex-local-backend-x86_64-unknown-linux-gnu.zip && \
+    unzip convex-local-backend-x86_64-unknown-linux-gnu.zip 
 
-# Copy built application
-COPY --from=build /app /app
-
-# Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
-CMD [ "npm", "run", "start" ]
+COPY ./patches/vite.config.ts ./
+COPY ./patches/characters.ts ./patches/gentle.js ./data/
+COPY ./patches/run.sh ./
+CMD ["./run.sh"]

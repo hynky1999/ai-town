@@ -6,6 +6,7 @@ import { data as f5SpritesheetData } from './spritesheets/f5';
 import { data as f6SpritesheetData } from './spritesheets/f6';
 import { data as f7SpritesheetData } from './spritesheets/f7';
 import { data as f8SpritesheetData } from './spritesheets/f8';
+import { data as c1SpritesheetData } from './spritesheets/c1';
 
 export const Descriptions = [
   {
@@ -168,53 +169,60 @@ export const Descriptions = [
 export const characters = [
   {
     name: 'f1',
-    textureUrl: '/ai-town/assets/32x32folk.png',
+    textureUrl: '/assets/32x32folk.png',
     spritesheetData: f1SpritesheetData,
-    speed: 0.1,
+    speed: 0.15,
   },
   {
     name: 'f2',
-    textureUrl: '/ai-town/assets/32x32folk.png',
+    textureUrl: '/assets/32x32folk.png',
     spritesheetData: f2SpritesheetData,
-    speed: 0.1,
+    speed: 0.15,
   },
   {
     name: 'f3',
-    textureUrl: '/ai-town/assets/32x32folk.png',
+    textureUrl: '/assets/32x32folk.png',
     spritesheetData: f3SpritesheetData,
-    speed: 0.1,
+    speed: 0.15,
   },
   {
     name: 'f4',
-    textureUrl: '/ai-town/assets/32x32folk.png',
+    textureUrl: '/assets/32x32folk.png',
     spritesheetData: f4SpritesheetData,
-    speed: 0.1,
+    speed: 0.15,
   },
   {
     name: 'f5',
-    textureUrl: '/ai-town/assets/32x32folk.png',
+    textureUrl: '/assets/32x32folk.png',
     spritesheetData: f5SpritesheetData,
-    speed: 0.1,
+    speed: 0.15,
   },
   {
     name: 'f6',
-    textureUrl: '/ai-town/assets/32x32folk.png',
+    textureUrl: '/assets/32x32folk.png',
     spritesheetData: f6SpritesheetData,
-    speed: 0.1,
+    speed: 0.15,
   },
   {
     name: 'f7',
-    textureUrl: '/ai-town/assets/32x32folk.png',
+    textureUrl: '/assets/32x32folk.png',
     spritesheetData: f7SpritesheetData,
-    speed: 0.1,
+    speed: 0.15,
   },
   {
     name: 'f8',
-    textureUrl: '/ai-town/assets/32x32folk.png',
+    textureUrl: '/assets/32x32folk.png',
     spritesheetData: f8SpritesheetData,
-    speed: 0.1,
+    speed: 0.15,
   },
+  {
+    name: 'c1',
+    textureUrl: '/ai-town/assets/GrayCat.png',
+    spritesheetData: c1SpritesheetData,
+    speed: 0.19,
+  },
+
 ];
 
 // Characters move at 0.75 tiles per second.
-export const movementSpeed = 0.75;
+export const movementSpeed = 1;
