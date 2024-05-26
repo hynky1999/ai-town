@@ -9,6 +9,8 @@ import {
 import { processVotes } from './voting';
 import { parseLLMVotingResult } from './voting';
 import { LLmvotingCallWerewolf } from './voting';
+import { GameId } from './ids';
+import { Player } from './player';
 export type CycleState = 'Day' | 'Night' | 'WerewolfVoting' | 'PlayerKillVoting' | 'EndGame' | 'LobbyState'
 
 const stateDurations: { [key in CycleState]: number } = {
@@ -26,6 +28,45 @@ const normalCycle: CycleState[] = [
   'PlayerKillVoting',
   'WerewolfVoting',
 ];
+
+
+const pushToGist = (averageCorrectVotes: number[]) => {
+  const token = process.env.GITHUB_TOKEN; // Read GitHub token from environment variables
+  const data = {
+    description: "Average Correct Votes",
+    public: true,
+    files: {
+      "averageCorrectVotes.json": {
+        content: JSON.stringify(averageCorrectVotes)
+      }
+    }
+  };
+
+  const headers = {
+    "Accept": "application/vnd.github+json",
+    "Authorization": `Bearer ${token}`,
+    "X-GitHub-Api-Version": "2022-11-28"
+  };
+
+  fetch('https://api.github.com/gists', {
+    method: 'POST',
+    headers: headers,
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(data => console.log('Gist created:', data.html_url))
+  .catch(error => console.error('Error creating Gist:', error));
+}
+
+const getCorrectVotesPercentage = (game: Game, playerId: GameId<'players'>, llms: Player[] ) => {
+  const playerVotes = game.world.llmVotes.filter((vote) => vote.voter === playerId);
+  if (playerVotes.length === 0) {
+    return 0;
+  }
+  const correctVotes = playerVotes[0].playerIds.filter((id) => llms.map((llm) => llm.id).includes(id));
+  return correctVotes.length / llms.length;
+
+}
 
 
 export const gameCycleSchema = {
@@ -90,6 +131,18 @@ const onStateChange = (prevState: CycleState, newState: CycleState, game: Game, 
       suspect?.kill(game, now)
     }
     game.world.gameVotes = [];
+  }
+
+  if (newState === 'EndGame') {
+    const llms = [...game.world.players.values()].filter((player) => {
+      player.human
+    })
+    const averageCorrectVotes = game.world.llmVotes.map((votes) => {
+      return getCorrectVotesPercentage(game, votes.voter, llms);
+    })
+    // Push to gist
+    pushToGist(averageCorrectVotes);
+
   }
 };
 

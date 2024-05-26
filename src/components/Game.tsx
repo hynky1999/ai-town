@@ -12,14 +12,13 @@ import { DebugTimeManager } from './DebugTimeManager.tsx';
 import { GameId } from '../../convex/aiTown/ids.ts';
 import { Game as GameObj} from '../../convex/aiTown/game.ts';
 import { ServerGame, useServerGame } from '../hooks/serverGame.ts';
-import { VoteModal } from './VoteModal.tsx';
 import { GameCycle } from '../../convex/aiTown/gameCycle.ts';
 import { PlayerDescription } from '../../convex/aiTown/playerDescription.ts';
 import { Cloud } from './Cloud.tsx';
 import VotingPopover from './LLMVote.tsx';
 import { createPortal } from 'react-dom';
-import { useSendInput } from "../hooks/sendInput";
 import GameVote from './GameVote.tsx';
+import { EndGame } from './EndGame.tsx';
 
 export const SHOW_DEBUG_UI = !!import.meta.env.VITE_SHOW_DEBUG_UI;
 
@@ -62,6 +61,10 @@ export function canVote(game: ServerGame, me: PlayerDescription | undefined) {
   return me && (game.world.gameCycle.cycleState === "WerewolfVoting" || (game.world.gameCycle.cycleState === "PlayerKillVoting" && me.type === "werewolf"));
 }
 
+export function isEndGame(game: ServerGame) {
+  return game.world.gameCycle.cycleState === "EndGame";
+}
+
 function showMap(gameCycle: GameCycle, me: PlayerDescription | undefined) {
   // Here also check for player description
   return (gameCycle.cycleState === "Day" || gameCycle.cycleState === "WerewolfVoting") || me?.type === "werewolf";
@@ -74,8 +77,6 @@ export default function Game() {
     id: GameId<'players'>;
   }>();
   const [gameWrapperRef, { width, height }] = useElementSize();
-  const [votes, setVotes] = useState<GameId<'players'>[]>([]);
-
   const worldStatus = useQuery(api.world.defaultWorldStatus);
   const worldId = worldStatus?.worldId;
   const engineId = worldStatus?.engineId;
@@ -136,15 +137,16 @@ https://github.com/michalochman/react-pixi-fiber/issues/145#issuecomment-5315492
             <h2 className="text-2xl font-bold">{GameStateLabel(game as GameObj, meDescription).label}</h2>
             <p className="text-lg text-center">{GameStateLabel(game as GameObj, meDescription).desc}</p>
           </div>
-          {playerId && canVote(game, meDescription) ? <GameVote engineId={engineId} game={game} playerId={playerId} /> : <PlayerDetails
+          {playerId && !isEndGame(game) && canVote(game, meDescription) && <GameVote engineId={engineId} game={game} playerId={playerId} />}
+          {!isEndGame(game) && !canVote(game, meDescription) && <PlayerDetails
             worldId={worldId}
             engineId={engineId}
             game={game}
             playerId={selectedElement?.id}
             setSelectedElement={setSelectedElement}
             scrollViewRef={scrollViewRef}
-          />
-}
+          />}
+          {playerId && isEndGame(game) && <EndGame game={game} playerId={playerId} />}
         </div>
       </div>
       {createPortal(

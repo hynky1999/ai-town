@@ -120,14 +120,14 @@ export async function LLmvotingCallWerewolf(werewolf: Player, villagers: PlayerD
   };
   // Streaming chat completion API
   const llama3 = inference.endpoint(
-    "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions"
+    "https://lr2bjyq40uegzvb5.us-east-1.aws.endpoints.huggingface.cloud"
   );
 
   const response = await llama3.chatCompletion(params);
   return response?.choices[0]?.message?.tool_calls?.[0]?.function || null;
 }
 export async function LLmvotingCallAll(villagers: PlayerDescription[]) {
-  const inference = new HfInference("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");
+  const inference = new HfInference();
   const params = {
     model: "tgi",
     messages: [
@@ -158,7 +158,7 @@ export async function LLmvotingCallAll(villagers: PlayerDescription[]) {
   };
   // Streaming chat completion API
   const llama3 = inference.endpoint(
-    "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions"
+    "https://lr2bjyq40uegzvb5.us-east-1.aws.endpoints.huggingface.cloud"
   );
 
   const response = await llama3.chatCompletion(params);
